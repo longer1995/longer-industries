@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Manufacturing Crisis Consulting - Longer Industries</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: rgba(0,0,0,0.9);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: #ff6b35;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .emergency-badge {
+            background: #ff0000;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        main {
+            margin-top: 80px;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23333" width="1200" height="600"/><circle fill="%23555" cx="200" cy="150" r="50"/><circle fill="%23555" cx="800" cy="250" r="40"/><circle fill="%23555" cx="1000" cy="100" r="60"/></svg>');
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ff6b35;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #ccc;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #ff6b35;
+            color: white;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 10px;
+        }
+        
+        .cta-button:hover {
+            background: #e55a2d;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+        
+        .cta-phone {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        .cta-phone:hover {
+            background: #00dd00;
+        }
+        
+        .services {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .services h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: #333;
+        }
+        
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .service-card {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #ff6b35;
+        }
+        
+        .service-card h3 {
+            color: #ff6b35;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+        
+        .price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            margin: 15px 0;
+        }
+        
+        .timeline {
+            background: #ff6b35;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .about {
+            padding: 80px 0;
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .credentials {
+            background: rgba(255, 107, 53, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #ff6b35;
+        }
+        
+        .credentials h3 {
+            color: #ff6b35;
+            margin-bottom: 20px;
+        }
+        
+        .credentials ul {
+            list-style: none;
+        }
+        
+        .credentials li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.3);
+        }
+        
+        .credentials li:before {
+            content: "✓";
+            color: #ff6b35;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .testimonial {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border-left: 5px solid #ff6b35;
+        }
+        
+        .contact {
+            padding: 80px 0;
+            background: #ff6b35;
+            color: white;
+            text-align: center;
+        }
+        
+        .contact h2 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+        }
+        
+        .contact-info {
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+        
+        .phone-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 30px 0;
+            background: white;
+            color: #ff6b35;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .service-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">LONGER INDUSTRIES</div>
+                <div class="emergency-badge">🚨 AVAILABLE NOW</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>EMERGENCY MANUFACTURING CRISIS CONSULTING</h1>
+                <p class="hero-subtitle">48-Hour Response • Defense & Industrial Expertise • $50M+ Track Record</p>
+                <a href="tel:7138558055" class="cta-button cta-phone">📞 CALL NOW: 713-855-8055</a>
+                <a href="mailto:longerindustries@gmail.com" class="cta-button">📧 Email Emergency</a>
+            </div>
+        </section>
+
+        <section class="services">
+            <div class="container">
+                <h2>EMERGENCY SERVICES</h2>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <div class="timeline">48 HOURS</div>
+                        <h3>Crisis Manufacturing Resolution</h3>
+                        <div class="price">$15,000</div>
+                        <ul>
+                            <li>Immediate problem assessment</li>
+                            <li>Emergency supplier activation</li>
+                            <li>Quality control crisis management</li>
+                            <li>48-hour implementation plan</li>
+                            <li>Crisis team coordination</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="timeline">THIS WEEK</div>
+                        <h3>Defense Procurement Emergency</h3>
+                        <div class="price">$25,000</div>
+                        <ul>
+                            <li>ITAR compliance emergency audit</li>
+                            <li>International supplier network activation</li>
+                            <li>Government liaison management</li>
+                            <li>Expedited qualification processes</li>
+                            <li>Contract rescue operations</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="timeline">24 HOURS</div>
+                        <h3>Industrial Valve Crisis Response</h3>
+                        <div class="price">$7,500</div>
+                        <ul>
+                            <li>Critical failure analysis</li>
+                            <li>Emergency replacement sourcing</li>
+                            <li>Plant shutdown prevention</li>
+                            <li>Custom solution engineering</li>
+                            <li>90-day warranty included</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="timeline">IMMEDIATE</div>
+                        <h3>Supply Chain Emergency</h3>
+                        <div class="price">$12,500</div>
+                        <ul>
+                            <li>Critical supplier failure recovery</li>
+                            <li>International sourcing activation</li>
+                            <li>Alternative supplier qualification</li>
+                            <li>Logistics crisis management</li>
+                            <li>Risk mitigation planning</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="timeline">ONGOING</div>
+                        <h3>Equipment Brokerage</h3>
+                        <div class="price">6-8% Commission</div>
+                        <ul>
+                            <li>High-value equipment deals</li>
+                            <li>International supplier connections</li>
+                            <li>Defense surplus opportunities</li>
+                            <li>Industrial equipment sourcing</li>
+                            <li>Deal structuring and financing</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="timeline">FREE</div>
+                        <h3>Crisis Assessment Call</h3>
+                        <div class="price">$0</div>
+                        <ul>
+                            <li>15-minute problem assessment</li>
+                            <li>Solution feasibility analysis</li>
+                            <li>Timeline and cost estimate</li>
+                            <li>Risk evaluation</li>
+                            <li>No obligation consultation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about">
+            <div class="container">
+                <div class="about-content">
+                    <div class="credentials">
+                        <h3>BRANDON LONGER - CRISIS EXPERT</h3>
+                        <ul>
+                            <li>Co-founder GCDL Defense: International ordnance specialist</li>
+                            <li>Founder American Munitions: $1.8M annual revenue</li>
+                            <li>Former VP Severe Service Valves: 2 years industrial expertise</li>
+                            <li>$50M+ in defense contracts managed</li>
+                            <li>10+ years manufacturing crisis management</li>
+                            <li>International network: Eastern Europe, South Asia, Americas</li>
+                            <li>ITAR compliance and export control expertise</li>
+                            <li>Emergency response available 24/7</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h2>PROVEN CRISIS MANAGEMENT</h2>
+                        <p style="font-size: 1.2rem; margin-bottom: 30px;">
+                            When manufacturing crises strike, every hour counts. With over a decade of experience in defense manufacturing, international procurement, and industrial operations, I specialize in turning critical failures into rapid solutions.
+                        </p>
+
+                        <div class="testimonial">
+                            <p><strong>"Prevented a $2M plant shutdown in 48 hours."</strong></p>
+                            <p style="margin-top: 10px; opacity: 0.8;">Paper mill critical valve failure - Emergency replacement sourced and installed within 2 days.</p>
+                        </div>
+
+                        <div class="testimonial">
+                            <p><strong>"ITAR compliance emergency resolved, saved $15M contract."</strong></p>
+                            <p style="margin-top: 10px; opacity: 0.8;">Defense contractor facing compliance violation - Emergency audit and documentation completed in 72 hours.</p>
+                        </div>
+
+                        <div class="testimonial">
+                            <p><strong>"Critical supplier failure replacement in 48 hours."</strong></p>
+                            <p style="margin-top: 10px; opacity: 0.8;">International ammunition supplier failed - Activated Eastern Europe backup network, maintained production schedule.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact">
+            <div class="container">
+                <h2>EMERGENCY CONTACT</h2>
+                <p class="contact-info">Available 24/7 for Manufacturing Crises</p>
+                <div class="phone-number">📞 713-855-8055</div>
+                <p class="contact-info">longerindustries@gmail.com</p>
+                <p style="margin-top: 30px; font-size: 1.2rem;">
+                    <strong>FIRST CONSULTATION FREE</strong><br>
+                    If I can't solve your crisis, no charge.
+                </p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
