@@ -2,10 +2,10 @@
   "lastChecks": {
     "jobSearch": 1710198540,
     "brokeragePlatform": 1710198540,
-    "twitterStrategy": 1710182280,
-    "gitCommit": 1710198540,
+    "twitterStrategy": 1710200820,
+    "gitCommit": 1710200820,
     "email": null,
     "memoryMaintenance": null
   },
-  "lastSectors": ["tech", "empire-building", "brokerage", "twitter-enhanced", "energy"]
+  "lastSectors": ["tech", "empire-building", "brokerage", "twitter-enhanced", "energy", "twitter-content"]
 }
