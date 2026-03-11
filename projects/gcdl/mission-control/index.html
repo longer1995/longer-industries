@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCDL Defense — Mission Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   CSS RESET & VARIABLES
+   ═══════════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--bg2:#0d1224;--card:#131a2e;--card-hover:#182040;
+  --border:#1e2a4a;--border-glow:#253560;
+  --green:#00ff88;--green-dim:#00cc6a;--amber:#ffaa00;--red:#ff4444;
+  --blue:#3b82f6;--purple:#a855f7;--cyan:#06b6d4;
+  --text:#e2e8f0;--text-dim:#94a3b8;--text-muted:#64748b;
+  --sidebar-w:260px;--sidebar-collapsed:68px;--header-h:60px;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --transition:all .25s cubic-bezier(.4,0,.2,1);
+  font-size:14px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh}
+a{color:var(--blue);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:var(--text)}
+input,select,textarea{font-family:inherit;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:8px 12px;outline:none;transition:var(--transition)}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+#loading-screen{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease}
+#loading-screen.fade-out{opacity:0;pointer-events:none}
+#loading-screen .logo-pulse{animation:pulse-glow 2s ease-in-out infinite}
+#loading-screen .bar-track{width:280px;height:4px;background:var(--border);border-radius:2px;margin-top:32px;overflow:hidden}
+#loading-screen .bar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:2px;transition:width .3s ease}
+#loading-screen p{margin-top:16px;color:var(--text-dim);font-size:13px;letter-spacing:2px;text-transform:uppercase}
+@keyframes pulse-glow{0%,100%{filter:drop-shadow(0 0 8px rgba(0,255,136,.3))}50%{filter:drop-shadow(0 0 24px rgba(0,255,136,.7))}}
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════════════════════════ */
+#app{display:flex;height:100vh;opacity:0;transition:opacity .4s ease}
+#app.visible{opacity:1}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:var(--transition);overflow:hidden;z-index:100}
+#sidebar.collapsed{width:var(--sidebar-collapsed);min-width:var(--sidebar-collapsed)}
+#sidebar .brand{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);min-height:var(--header-h)}
+#sidebar .brand h1{font-size:14px;font-weight:800;letter-spacing:1.5px;white-space:nowrap;background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#sidebar .brand .subtitle{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;white-space:nowrap}
+#sidebar.collapsed .brand h1,#sidebar.collapsed .brand .subtitle,#sidebar.collapsed .nav-label,#sidebar.collapsed .nav-text{display:none}
+#sidebar nav{flex:1;overflow-y:auto;padding:8px}
+.nav-label{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);padding:16px 12px 6px;white-space:nowrap}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition);white-space:nowrap;margin:1px 0;position:relative}
+.nav-item:hover{background:rgba(59,130,246,.08)}
+.nav-item.active{background:rgba(0,255,136,.08);color:var(--green)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--green);border-radius:0 2px 2px 0}
+.nav-item .icon{width:20px;text-align:center;font-size:16px;flex-shrink:0}
+.nav-text{font-size:13px;font-weight:500}
+#sidebar .sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.collapse-btn{width:100%;padding:8px;border-radius:var(--radius-sm);background:var(--card);font-size:12px;color:var(--text-dim);display:flex;align-items:center;justify-content:center;gap:8px;transition:var(--transition)}
+.collapse-btn:hover{background:var(--card-hover);color:var(--text)}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#header{height:var(--header-h);min-height:var(--header-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+#header .left{display:flex;align-items:center;gap:16px}
+#header .breadcrumb{font-size:13px;color:var(--text-dim)}
+#header .breadcrumb span{color:var(--text)}
+#header .right{display:flex;align-items:center;gap:16px}
+.header-btn{width:36px;height:36px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;position:relative;transition:var(--transition);font-size:16px}
+.header-btn:hover{background:var(--card)}
+.header-btn .badge{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--bg2)}
+#live-clock{font-family:'Inter',monospace;font-size:12px;color:var(--green);background:rgba(0,255,136,.08);padding:4px 10px;border-radius:4px;letter-spacing:1px;font-weight:600}
+.system-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);text-transform:uppercase;letter-spacing:1px}
+.system-status .dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;padding:24px;background:var(--bg)}
+.module{display:none;animation:fadeIn .3s ease}
+.module.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════════════════════════════════════════════════════════
+   REUSABLE COMPONENTS
+   ═══════════════════════════════════════════════════════════════ */
+.grid{display:grid;gap:20px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-8{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1200px){.grid-4,.grid-8{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.grid-2,.grid-3,.grid-4,.grid-8{grid-template-columns:1fr}#sidebar{position:fixed;left:-300px;z-index:500}#sidebar.mobile-open{left:0}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:var(--transition)}
+.card:hover{border-color:var(--border-glow);box-shadow:0 0 20px rgba(59,130,246,.05)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600;color:var(--text)}
+.card-subtitle{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.module-title{font-size:22px;font-weight:800;margin-bottom:4px}
+.module-desc{font-size:13px;color:var(--text-dim);margin-bottom:24px}
+.badge-pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(0,255,136,.1);color:var(--green)}
+.badge-amber{background:rgba(255,170,0,.1);color:var(--amber)}
+.badge-red{background:rgba(255,68,68,.1);color:var(--red)}
+.badge-blue{background:rgba(59,130,246,.1);color:var(--blue)}
+.badge-purple{background:rgba(168,85,247,.1);color:var(--purple)}
+.btn{padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:var(--transition);display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#2563eb;transform:translateY(-1px)}
+.btn-green{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.2)}
+.btn-green:hover{background:rgba(0,255,136,.2)}
+.btn-outline{border:1px solid var(--border);color:var(--text-dim)}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.progress-bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);border-bottom:1px solid var(--border);font-weight:600}
+td{padding:10px 12px;font-size:13px;border-bottom:1px solid rgba(30,42,74,.4)}
+tr:hover td{background:rgba(59,130,246,.03)}
+.kpi-card{text-align:center;padding:20px 16px}
+.kpi-card .kpi-icon{font-size:24px;margin-bottom:8px}
+.kpi-card .kpi-value{font-size:28px;font-weight:800;line-height:1.1;margin-bottom:4px}
+.kpi-card .kpi-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.kpi-card .kpi-change{font-size:11px;margin-top:6px;font-weight:600}
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;padding:4px;background:var(--bg2);border-radius:var(--radius-sm);overflow-x:auto}
+.tab-btn{padding:8px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;color:var(--text-dim);white-space:nowrap;transition:var(--transition)}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{background:var(--card);color:var(--green)}
+.chart-container{position:relative;height:280px}
+.section-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.tooltip{position:relative}
+.tooltip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1e293b;color:var(--text);padding:6px 12px;border-radius:6px;font-size:11px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+.tooltip:hover::after{opacity:1}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;transform:scale(.95);transition:transform .2s}
+.modal-overlay.show .modal{transform:scale(1)}
+.modal h3{font-size:18px;margin-bottom:16px}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.5px}
+.star{color:var(--amber)}
+.text-green{color:var(--green)}.text-amber{color:var(--amber)}.text-red{color:var(--red)}.text-blue{color:var(--blue)}.text-dim{color:var(--text-dim)}
+.flex{display:flex}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}.gap-20{gap:20px}
+.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}.mb-16{margin-bottom:16px}.mb-24{margin-bottom:24px}
+.w-full{width:100%}
+.text-right{text-align:right}
+.text-center{text-align:center}
+.font-mono{font-family:'SF Mono','Fira Code',monospace}
+
+/* ═══════════════════════════════════════════════════════════════
+   SPECIFIC COMPONENTS
+   ═══════════════════════════════════════════════════════════════ */
+/* OEE Gauge */
+.gauge-wrap{position:relative;width:180px;height:100px;margin:0 auto}
+.gauge-bg{fill:none;stroke:var(--border);stroke-width:14}
+.gauge-fill{fill:none;stroke:var(--green);stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset 1.5s ease}
+.gauge-value{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:32px;font-weight:800}
+.gauge-label{text-align:center;font-size:11px;color:var(--text-muted);margin-top:4px}
+
+/* Station cards */
+.station{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;transition:var(--transition);cursor:pointer}
+.station:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.station .station-num{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.station .station-name{font-size:13px;font-weight:600;margin:4px 0}
+.station .station-status{width:8px;height:8px;border-radius:50%;display:inline-block}
+.station-meta{font-size:11px;color:var(--text-dim);display:flex;flex-direction:column;gap:3px;margin-top:8px}
+.pipeline{display:flex;align-items:center;gap:2px;overflow-x:auto;padding:4px 0}
+.pipeline .arrow{color:var(--text-muted);font-size:18px;flex-shrink:0}
+
+/* Order cards */
+.order-card{border-left:3px solid var(--blue)}
+.order-card.status-production{border-left-color:var(--green)}
+.order-card.status-quote{border-left-color:var(--amber)}
+.order-card.status-lead{border-left-color:var(--text-muted)}
+.order-card.status-negotiation{border-left-color:var(--purple)}
+.order-card.status-po{border-left-color:var(--blue)}
+
+/* BOM tree */
+.bom-tree{list-style:none}
+.bom-item{padding:10px 12px;border-left:2px solid var(--border);margin-left:12px;cursor:pointer;transition:var(--transition)}
+.bom-item:hover{border-left-color:var(--green);background:rgba(0,255,136,.03)}
+.bom-item .bom-name{font-weight:600;font-size:13px}
+.bom-item .bom-detail{font-size:11px;color:var(--text-dim);margin-top:2px}
+
+/* Alerts panel */
+.alert-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(30,42,74,.3)}
+.alert-item:last-child{border:none}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+
+/* Org chart */
+.org-card{display:flex;align-items:center;gap:14px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);transition:var(--transition)}
+.org-card:hover{border-color:var(--blue)}
+.org-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0}
+
+/* Weather widget */
+.weather-widget{display:flex;align-items:center;gap:16px}
+.weather-temp{font-size:36px;font-weight:800}
+.weather-details{font-size:12px;color:var(--text-dim)}
+
+/* Assembly line SVG area */
+.assembly-line{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:1100px){.assembly-line{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.assembly-line{grid-template-columns:1fr}}
+
+/* M433 diagram */
+.round-diagram{position:relative;max-width:500px;margin:0 auto}
+.round-part{cursor:pointer;transition:var(--transition)}
+.round-part:hover{filter:brightness(1.3);transform:scale(1.02)}
+
+/* Document browser */
+.folder-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition)}
+.folder-item:hover{background:rgba(59,130,246,.06)}
+
+/* Print mode */
+@media print{
+  #sidebar,#header,.no-print{display:none!important}
+  #content{padding:0!important}
+  .card{break-inside:avoid;border:1px solid #ddd}
+  body{background:#fff;color:#000}
+}
+
+/* Keyboard shortcut overlay */
+#kb-help{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;display:none;align-items:center;justify-content:center}
+#kb-help.show{display:flex}
+#kb-help .inner{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:480px;width:90%}
+#kb-help kbd{display:inline-block;background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;font-family:monospace;min-width:28px;text-align:center}
+.kb-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(30,42,74,.3)}
+
+/* Notification dropdown */
+.notif-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:360px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);z-index:200;display:none;max-height:400px;overflow-y:auto}
+.notif-dropdown.show{display:block}
+.notif-item{padding:12px 16px;border-bottom:1px solid rgba(30,42,74,.3);cursor:pointer;transition:var(--transition)}
+.notif-item:hover{background:rgba(59,130,246,.04)}
+.notif-item.unread{border-left:3px solid var(--blue)}
+
+/* Quick actions */
+.quick-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition);font-size:11px;color:var(--text-dim);text-align:center}
+.quick-action:hover{border-color:var(--green);color:var(--green);transform:translateY(-2px)}
+.quick-action .qa-icon{font-size:24px}
+
+/* Animated counter */
+.rolling-counter{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     LOADING SCREEN
+     ════════════════════════════════════════════════════════════ -->
+<div id="loading-screen">
+  <svg class="logo-pulse" width="80" height="80" viewBox="0 0 100 100">
+    <defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ff88"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs>
+    <path d="M50 5 L90 25 L90 65 L50 95 L10 65 L10 25 Z" fill="none" stroke="url(#lg1)" stroke-width="3"/>
+    <path d="M50 20 L70 32 L70 56 L50 72 L30 56 L30 32 Z" fill="none" stroke="url(#lg1)" stroke-width="2" opacity=".6"/>
+    <text x="50" y="52" text-anchor="middle" fill="url(#lg1)" font-size="16" font-weight="800" font-family="Inter,system-ui">GCDL</text>
+  </svg>
+  <div class="bar-track"><div class="bar-fill" id="load-bar"></div></div>
+  <p id="load-text">Initializing systems...</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     APP
+     ════════════════════════════════════════════════════════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="brand">
+      <svg width="36" height="36" viewBox="0 0 100 100">
+        <defs><linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ff88"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs>
+        <path d="M50 5 L90 25 L90 65 L50 95 L10 65 L10 25 Z" fill="none" stroke="url(#lg2)" stroke-width="3"/>
+        <path d="M50 20 L70 32 L70 56 L50 72 L30 56 L30 32 Z" fill="none" stroke="url(#lg2)" stroke-width="2" opacity=".5"/>
+        <text x="50" y="52" text-anchor="middle" fill="url(#lg2)" font-size="14" font-weight="800" font-family="Inter,system-ui">GCDL</text>
+      </svg>
+      <div>
+        <h1>GCDL DEFENSE</h1>
+        <div class="subtitle">Mission Control v2.0</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-label">Operations</div>
+      <div class="nav-item active" data-module="dashboard" onclick="switchModule('dashboard')">
+        <span class="icon">📊</span><span class="nav-text">Executive Dashboard</span>
+      </div>
+      <div class="nav-item" data-module="production" onclick="switchModule('production')">
+        <span class="icon">🏭</span><span class="nav-text">Production</span>
+      </div>
+      <div class="nav-item" data-module="orders" onclick="switchModule('orders')">
+        <span class="icon">📋</span><span class="nav-text">Orders & Contracts</span>
+      </div>
+      <div class="nav-item" data-module="inventory" onclick="switchModule('inventory')">
+        <span class="icon">📦</span><span class="nav-text">Inventory & BOM</span>
+      </div>
+      <div class="nav-item" data-module="supply" onclick="switchModule('supply')">
+        <span class="icon">🔗</span><span class="nav-text">Supply Chain</span>
+      </div>
+      <div class="nav-label">Control</div>
+      <div class="nav-item" data-module="quality" onclick="switchModule('quality')">
+        <span class="icon">✅</span><span class="nav-text">Quality & Compliance</span>
+      </div>
+      <div class="nav-item" data-module="financial" onclick="switchModule('financial')">
+        <span class="icon">💰</span><span class="nav-text">Financial</span>
+      </div>
+      <div class="nav-item" data-module="logistics" onclick="switchModule('logistics')">
+        <span class="icon">🚚</span><span class="nav-text">Logistics & Shipping</span>
+      </div>
+      <div class="nav-label">Intelligence</div>
+      <div class="nav-item" data-module="team" onclick="switchModule('team')">
+        <span class="icon">👥</span><span class="nav-text">Team & Comms</span>
+      </div>
+      <div class="nav-item" data-module="analytics" onclick="switchModule('analytics')">
+        <span class="icon">📈</span><span class="nav-text">Analytics & Reports</span>
+      </div>
+      <div class="nav-item" data-module="techref" onclick="switchModule('techref')">
+        <span class="icon">🎯</span><span class="nav-text">M433A1 Reference</span>
+      </div>
+      <div class="nav-item" data-module="safety" onclick="switchModule('safety')">
+        <span class="icon">⚠️</span><span class="nav-text">Safety & Environ.</span>
+      </div>
+      <div class="nav-item" data-module="documents" onclick="switchModule('documents')">
+        <span class="icon">📁</span><span class="nav-text">Document Center</span>
+      </div>
+      <div class="nav-item" data-module="settings" onclick="switchModule('settings')">
+        <span class="icon">⚙️</span><span class="nav-text">Settings & Admin</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="collapse-btn" onclick="toggleSidebar()">
+        <span id="collapse-icon">◀</span>
+        <span class="nav-text">Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div id="main">
+    <header id="header">
+      <div class="left">
+        <button class="header-btn" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+        <div class="breadcrumb">GCDL Defense › <span id="breadcrumb-page">Executive Dashboard</span></div>
+      </div>
+      <div class="right">
+        <div class="system-status"><span class="dot"></span> System Online</div>
+        <div id="live-clock">--:--:-- UTC</div>
+        <div style="position:relative">
+          <button class="header-btn" onclick="toggleNotifications()" title="Notifications">🔔<span class="badge"></span></button>
+          <div class="notif-dropdown" id="notif-dropdown">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:14px">Notifications</div>
+            <div class="notif-item unread"><div style="font-size:12px;font-weight:600">⚠️ Low Stock Alert</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">M550A1 PD Fuze below reorder point (2,400 remaining)</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">2 min ago</div></div>
+            <div class="notif-item unread"><div style="font-size:12px;font-weight:600">📋 New PO Received</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">BAE Systems — 100,000 M433A1 HEDP — $4,500,000</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">1 hour ago</div></div>
+            <div class="notif-item"><div style="font-size:12px;font-weight:600">✅ QC Lot Approved</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">Lot #M433-2026-0047 passed final inspection</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">3 hours ago</div></div>
+            <div class="notif-item"><div style="font-size:12px;font-weight:600">🚚 Shipment Delivered</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">SHP-2026-012 delivered to Colt USA — Signed by J. Martinez</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">Yesterday</div></div>
+          </div>
+        </div>
+        <button class="header-btn" onclick="window.print()" title="Print">🖨️</button>
+        <button class="header-btn" onclick="showKBHelp()" title="Keyboard shortcuts (?)">⌨️</button>
+        <div class="user-avatar" title="Brandon Longer">BL</div>
+      </div>
+    </header>
+
+    <div id="content">
+      <!-- ════════════════════════════════════════
+           MODULE 1: EXECUTIVE DASHBOARD
+           ════════════════════════════════════════ -->
+      <div class="module active" id="mod-dashboard">
+        <div class="flex justify-between items-center mb-24" style="justify-content:space-between">
+          <div>
+            <div class="module-title">Executive Dashboard</div>
+            <div class="module-desc">Real-time operational overview — M433A1 HEDP Production Program</div>
+          </div>
+          <div class="weather-widget card" style="padding:12px 18px">
+            <div>
+              <div style="font-size:11px;color:var(--text-muted)">Whitefish, MT</div>
+              <div class="weather-temp">28°F</div>
+            </div>
+            <div class="weather-details">
+              <div>❄️ Light Snow</div>
+              <div>Wind: 12 mph NW</div>
+              <div>Humidity: 78%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-8 mb-24" style="grid-template-columns:repeat(4,1fr)">
+          <div class="card kpi-card">
+            <div class="kpi-icon">💎</div>
+            <div class="kpi-value text-blue">$<span class="rolling-counter" data-target="20075000">0</span></div>
+            <div class="kpi-label">Total Contract Value</div>
+            <div class="kpi-change text-green">↑ 18% vs last quarter</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-value text-green"><span class="rolling-counter" data-target="12847">0</span></div>
+            <div class="kpi-label">Units Produced MTD</div>
+            <div class="kpi-change text-green">↑ 8.2% vs target</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon">⚡</div>
+            <div class="kpi-value"><span class="rolling-counter" data-target="847">0</span><span style="font-size:14px;color:var(--text-dim)">/day</span></div>
+            <div class="kpi-label">Production Rate</div>
+            <div class="kpi-change text-green">↑ 3.4% this week</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon">🔧</div>
+            <div class="kpi-value text-green"><span class="rolling-counter" data-target="87">0</span><span style="font-size:14px">%</span></div>
+            <div class="kpi-label">OEE Score</div>
+            <div class="kpi-change text-green">↑ 2.1% vs last month</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon">📦</div>
+            <div class="kpi-value text-green"><span class="rolling-counter" data-target="94">0</span><span style="font-size:14px">%</span></div>
+            <div class="kpi-label">Inventory Health</div>
+            <div class="kpi-change text-amber">⚠ 1 item below reorder</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-value text-green">$<span class="rolling-counter" data-target="597381">0</span></div>
+            <div class="kpi-label">Revenue This Month</div>
+            <div class="kpi-change text-green">↑ 12% vs plan</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon">📋</div>
+            <div class="kpi-value text-blue"><span class="rolling-counter" data-target="5">0</span></div>
+            <div class="kpi-label">Active Orders</div>
+            <div class="kpi-change text-blue">2 in production</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon">📅</div>
+            <div class="kpi-value text-amber"><span class="rolling-counter" data-target="23">0</span><span style="font-size:14px"> days</span></div>
+            <div class="kpi-label">Next Delivery</div>
+            <div class="kpi-change">Colt USA — 10,000 rd</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-2 mb-24">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Production Trend (30 Days)</div>
+              <div class="badge-pill badge-green">Live</div>
+            </div>
+            <div class="chart-container"><canvas id="chart-prod-trend"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">OEE Breakdown</div>
+              <div class="badge-pill badge-green">87.3%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:24px">
+              <div class="gauge-wrap">
+                <svg viewBox="0 0 200 110" width="200" height="110">
+                  <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100"/>
+                  <path class="gauge-fill" id="oee-gauge" d="M 20 100 A 80 80 0 0 1 180 100" stroke-dasharray="251" stroke-dashoffset="251"/>
+                </svg>
+                <div class="gauge-value text-green">87.3%</div>
+              </div>
+              <div style="flex:1">
+                <div style="margin-bottom:12px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Availability — 94.2%</div><div class="progress-bar"><div class="progress-fill" style="width:94.2%;background:var(--green)"></div></div></div>
+                <div style="margin-bottom:12px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Performance — 96.1%</div><div class="progress-bar"><div class="progress-fill" style="width:96.1%;background:var(--blue)"></div></div></div>
+                <div><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Quality — 96.4%</div><div class="progress-bar"><div class="progress-fill" style="width:96.4%;background:var(--purple)"></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-2 mb-24">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Revenue vs Cost (Monthly)</div>
+            </div>
+            <div class="chart-container"><canvas id="chart-rev-cost"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Active Alerts</div>
+              <span class="badge-pill badge-red">4 Active</span>
+            </div>
+            <div>
+              <div class="alert-item"><div class="alert-dot" style="background:var(--red)"></div><div><div style="font-size:12px;font-weight:600">CRITICAL: M550A1 Fuze stock below reorder point</div><div style="font-size:11px;color:var(--text-dim)">2,400 remaining — reorder point is 5,000. Lead time: 45 days.</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">Today 14:22 UTC</div></div></div>
+              <div class="alert-item"><div class="alert-dot" style="background:var(--amber)"></div><div><div style="font-size:12px;font-weight:600">Station 4 throughput below target</div><div style="font-size:11px;color:var(--text-dim)">Projectile Sub-Assembly running at 82% — operator retraining scheduled.</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">Today 11:45 UTC</div></div></div>
+              <div class="alert-item"><div class="alert-dot" style="background:var(--amber)"></div><div><div style="font-size:12px;font-weight:600">Colt delivery deadline in 23 days</div><div style="font-size:11px;color:var(--text-dim)">10,000 rounds committed — 6,200 completed, 3,800 remaining at current rate.</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">Today 08:00 UTC</div></div></div>
+              <div class="alert-item"><div class="alert-dot" style="background:var(--blue)"></div><div><div style="font-size:12px;font-weight:600">Scheduled maintenance: Line 2</div><div style="font-size:11px;color:var(--text-dim)">Preventive maintenance window Mar 15 — B Shift.</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">Yesterday</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-title mb-16">Quick Actions</div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px">
+            <div class="quick-action" onclick="switchModule('production')"><div class="qa-icon">🏭</div>View Production</div>
+            <div class="quick-action" onclick="switchModule('orders')"><div class="qa-icon">📋</div>New Order</div>
+            <div class="quick-action" onclick="switchModule('inventory')"><div class="qa-icon">📦</div>Check Inventory</div>
+            <div class="quick-action" onclick="switchModule('quality')"><div class="qa-icon">✅</div>QC Reports</div>
+            <div class="quick-action" onclick="switchModule('financial')"><div class="qa-icon">💰</div>Financials</div>
+            <div class="quick-action" onclick="switchModule('techref')"><div class="qa-icon">🎯</div>M433A1 Specs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 2: PRODUCTION
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-production">
+        <div class="module-title">Production Control</div>
+        <div class="module-desc">M433A1 HEDP 40mm — Assembly Line Monitoring & Management</div>
+
+        <div class="tab-bar" id="prod-tabs">
+          <button class="tab-btn active" onclick="showProdTab('line')">Assembly Line</button>
+          <button class="tab-btn" onclick="showProdTab('status')">Line Status</button>
+          <button class="tab-btn" onclick="showProdTab('shifts')">Shift Schedule</button>
+          <button class="tab-btn" onclick="showProdTab('defects')">Defect Tracking</button>
+          <button class="tab-btn" onclick="showProdTab('calculator')">Rate Calculator</button>
+          <button class="tab-btn" onclick="showProdTab('output')">Output Charts</button>
+        </div>
+
+        <div id="prod-line" class="prod-tab-content">
+          <div class="assembly-line mb-24" id="assembly-stations"></div>
+        </div>
+
+        <div id="prod-status" class="prod-tab-content" style="display:none">
+          <div class="grid grid-2 mb-24">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Line 1</div><span class="badge-pill badge-green">● Running</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div><div style="font-size:11px;color:var(--text-muted)">Current Batch</div><div style="font-weight:700">M433-2026-0048</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">Batch Size</div><div style="font-weight:700">500 rounds</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">Completed</div><div style="font-weight:700">347 / 500</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">Rate</div><div style="font-weight:700">52 rds/hr</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">ETA Complete</div><div style="font-weight:700">~2.9 hrs</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">Shift</div><div style="font-weight:700">A Shift (6AM-2PM)</div></div>
+              </div>
+              <div class="mt-16"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Batch Progress</div><div class="progress-bar" style="height:10px"><div class="progress-fill" style="width:69.4%;background:var(--green)"></div></div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">69.4%</div></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Line 2</div><span class="badge-pill badge-amber">● Maintenance</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div><div style="font-size:11px;color:var(--text-muted)">Status</div><div style="font-weight:700;color:var(--amber)">Preventive Maint.</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">Down Since</div><div style="font-weight:700">06:00 UTC</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">Est. Return</div><div style="font-weight:700">14:00 UTC</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">Work Order</div><div style="font-weight:700">WO-2026-0089</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">Technician</div><div style="font-weight:700">M. Rodriguez</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">Last Batch</div><div style="font-weight:700">M433-2026-0047</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="prod-shifts" class="prod-tab-content" style="display:none">
+          <div class="card">
+            <div class="card-title mb-16">Shift Schedule — Week of Mar 10, 2026</div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Shift</th><th>Hours</th><th>Line 1 Lead</th><th>Line 2 Lead</th><th>Operators</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>A Shift</strong></td><td>0600–1400</td><td>T. Williams</td><td>S. Park (Maint.)</td><td>6</td><td><span class="badge-pill badge-green">Active</span></td></tr>
+                  <tr><td><strong>B Shift</strong></td><td>1400–2200</td><td>R. Johnson</td><td>K. Chen</td><td>6</td><td><span class="badge-pill badge-blue">Upcoming</span></td></tr>
+                  <tr><td><strong>C Shift</strong></td><td>2200–0600</td><td>M. Garcia</td><td>A. Patel</td><td>4</td><td><span class="badge-pill badge-blue">Upcoming</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="prod-defects" class="prod-tab-content" style="display:none">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-title mb-16">Defect Pareto Analysis</div>
+              <div class="chart-container"><canvas id="chart-defect-pareto"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-title mb-16">Recent Defect Log</div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Date</th><th>Lot</th><th>Station</th><th>Type</th><th>Qty</th><th>Disposition</th></tr></thead>
+                  <tbody>
+                    <tr><td>Mar 10</td><td>0048</td><td>Stn 8</td><td>Dim. Out of Spec</td><td>3</td><td><span class="badge-pill badge-red">Scrap</span></td></tr>
+                    <tr><td>Mar 10</td><td>0048</td><td>Stn 6</td><td>Band Alignment</td><td>7</td><td><span class="badge-pill badge-amber">Rework</span></td></tr>
+                    <tr><td>Mar 9</td><td>0047</td><td>Stn 4</td><td>Fill Weight</td><td>2</td><td><span class="badge-pill badge-red">Scrap</span></td></tr>
+                    <tr><td>Mar 9</td><td>0047</td><td>Stn 7</td><td>Crimp Depth</td><td>5</td><td><span class="badge-pill badge-amber">Rework</span></td></tr>
+                    <tr><td>Mar 8</td><td>0046</td><td>Stn 2</td><td>Primer Seat</td><td>1</td><td><span class="badge-pill badge-red">Scrap</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="prod-calculator" class="prod-tab-content" style="display:none">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-title mb-16">Production Rate Calculator</div>
+              <div style="display:grid;gap:16px">
+                <div><label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:4px">Order Quantity (rounds)</label><input type="number" id="calc-qty" value="50000" style="width:100%"></div>
+                <div><label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:4px">Shifts per Day</label><select id="calc-shifts" style="width:100%"><option value="1">1 Shift</option><option value="2" selected>2 Shifts</option><option value="3">3 Shifts</option></select></div>
+                <div><label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:4px">Production Lines</label><select id="calc-lines" style="width:100%"><option value="1">1 Line</option><option value="2" selected>2 Lines</option></select></div>
+                <div><label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:4px">Rate per Line per Shift (rds)</label><input type="number" id="calc-rate" value="420" style="width:100%"></div>
+                <button class="btn btn-primary w-full" onclick="calculateProduction()">Calculate</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title mb-16">Results</div>
+              <div id="calc-results" style="font-size:13px;color:var(--text-dim)">
+                <p>Enter parameters and click Calculate.</p>
+              </div>
+              <div class="mt-16"><canvas id="chart-gantt" height="200"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="prod-output" class="prod-tab-content" style="display:none">
+          <div class="grid grid-2">
+            <div class="card"><div class="card-title mb-16">Daily Output (Last 14 Days)</div><div class="chart-container"><canvas id="chart-daily-output"></canvas></div></div>
+            <div class="card"><div class="card-title mb-16">Monthly Output</div><div class="chart-container"><canvas id="chart-monthly-output"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 3: ORDERS & CONTRACTS
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-orders">
+        <div class="module-title">Orders & Contracts</div>
+        <div class="module-desc">Pipeline management, contract tracking, and milestone payments</div>
+
+        <!-- Pipeline -->
+        <div class="card mb-24">
+          <div class="card-title mb-16">Order Pipeline</div>
+          <div class="pipeline" style="display:flex;gap:8px;overflow-x:auto">
+            <div style="flex:1;text-align:center;padding:10px;background:rgba(100,116,139,.1);border-radius:var(--radius-sm)"><div style="font-size:20px;font-weight:800;color:var(--text-muted)">1</div><div style="font-size:10px;color:var(--text-muted)">LEAD</div><div style="font-size:11px;margin-top:4px">$8.6M</div></div>
+            <div style="color:var(--text-muted);display:flex;align-items:center">→</div>
+            <div style="flex:1;text-align:center;padding:10px;background:rgba(168,85,247,.1);border-radius:var(--radius-sm)"><div style="font-size:20px;font-weight:800;color:var(--purple)">1</div><div style="font-size:10px;color:var(--purple)">NEGOTIATION</div><div style="font-size:11px;margin-top:4px">$3.3M</div></div>
+            <div style="color:var(--text-muted);display:flex;align-items:center">→</div>
+            <div style="flex:1;text-align:center;padding:10px;background:rgba(255,170,0,.1);border-radius:var(--radius-sm)"><div style="font-size:20px;font-weight:800;color:var(--amber)">1</div><div style="font-size:10px;color:var(--amber)">QUOTE</div><div style="font-size:11px;margin-top:4px">$1.3M</div></div>
+            <div style="color:var(--text-muted);display:flex;align-items:center">→</div>
+            <div style="flex:1;text-align:center;padding:10px;background:rgba(59,130,246,.1);border-radius:var(--radius-sm)"><div style="font-size:20px;font-weight:800;color:var(--blue)">1</div><div style="font-size:10px;color:var(--blue)">PO RECEIVED</div><div style="font-size:11px;margin-top:4px">$4.5M</div></div>
+            <div style="color:var(--text-muted);display:flex;align-items:center">→</div>
+            <div style="flex:1;text-align:center;padding:10px;background:rgba(0,255,136,.1);border-radius:var(--radius-sm)"><div style="font-size:20px;font-weight:800;color:var(--green)">1</div><div style="font-size:10px;color:var(--green)">PRODUCTION</div><div style="font-size:11px;margin-top:4px">$2.375M</div></div>
+            <div style="color:var(--text-muted);display:flex;align-items:center">→</div>
+            <div style="flex:1;text-align:center;padding:10px;background:rgba(6,182,212,.1);border-radius:var(--radius-sm)"><div style="font-size:20px;font-weight:800;color:var(--cyan)">0</div><div style="font-size:10px;color:var(--cyan)">SHIPPING</div><div style="font-size:11px;margin-top:4px">$0</div></div>
+          </div>
+        </div>
+
+        <div id="order-cards-container" class="grid grid-2 mb-24"></div>
+
+        <div class="card">
+          <div class="card-title mb-16">Milestone Payment Schedule</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Order</th><th>Milestone</th><th>Amount</th><th>Due Date</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Colt USA</td><td>30% Advance on PO</td><td>$712,500</td><td>Feb 15, 2026</td><td><span class="badge-pill badge-green">Received</span></td></tr>
+                <tr><td>Colt USA</td><td>40% on 50% delivery</td><td>$950,000</td><td>Apr 2, 2026</td><td><span class="badge-pill badge-amber">Pending</span></td></tr>
+                <tr><td>Colt USA</td><td>30% on final delivery</td><td>$712,500</td><td>May 15, 2026</td><td><span class="badge-pill badge-blue">Scheduled</span></td></tr>
+                <tr><td>BAE Systems</td><td>20% Advance on PO</td><td>$900,000</td><td>Mar 20, 2026</td><td><span class="badge-pill badge-amber">Invoiced</span></td></tr>
+                <tr><td>BAE Systems</td><td>30% at 25% delivery</td><td>$1,350,000</td><td>Jun 1, 2026</td><td><span class="badge-pill badge-blue">Scheduled</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 4: INVENTORY & BOM
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-inventory">
+        <div class="module-title">Inventory & Bill of Materials</div>
+        <div class="module-desc">M433A1 HEDP component tracking, BOM management, and inventory health</div>
+
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="showInvTab('bom')">BOM Tree</button>
+          <button class="tab-btn" onclick="showInvTab('stock')">Stock Levels</button>
+          <button class="tab-btn" onclick="showInvTab('cost')">Cost Breakdown</button>
+          <button class="tab-btn" onclick="showInvTab('reorder')">Reorder Alerts</button>
+        </div>
+
+        <div id="inv-bom" class="inv-tab-content">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-title mb-16">M433A1 HEDP — Bill of Materials</div>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Total material cost per round: <strong style="color:var(--green)">$32.00</strong></div>
+              <ul class="bom-tree" id="bom-tree-container"></ul>
+            </div>
+            <div class="card">
+              <div class="card-title mb-16">Material Cost Breakdown</div>
+              <div class="chart-container"><canvas id="chart-bom-cost"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div id="inv-stock" class="inv-tab-content" style="display:none">
+          <div class="card">
+            <div class="card-title mb-16">Component Stock Levels</div>
+            <div class="table-wrap"><table><thead><tr><th>Component</th><th>On Hand</th><th>Committed</th><th>On Order</th><th>Reorder Pt</th><th>Lead Time</th><th>Status</th></tr></thead><tbody id="stock-table-body"></tbody></table></div>
+          </div>
+        </div>
+        <div id="inv-cost" class="inv-tab-content" style="display:none">
+          <div class="card">
+            <div class="card-title mb-16">Cost Per Round Breakdown</div>
+            <div class="chart-container"><canvas id="chart-cost-round"></canvas></div>
+          </div>
+        </div>
+        <div id="inv-reorder" class="inv-tab-content" style="display:none">
+          <div class="card">
+            <div class="card-title mb-16">Reorder Alerts</div>
+            <div id="reorder-alerts"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 5: SUPPLY CHAIN
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-supply">
+        <div class="module-title">Supply Chain Command</div>
+        <div class="module-desc">Supplier management, performance tracking, and risk assessment</div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="showSupplyTab('directory')">Supplier Directory</button>
+          <button class="tab-btn" onclick="showSupplyTab('performance')">Performance</button>
+          <button class="tab-btn" onclick="showSupplyTab('risk')">Risk Assessment</button>
+          <button class="tab-btn" onclick="showSupplyTab('pricing')">Price Trends</button>
+        </div>
+        <div id="supply-directory" class="supply-tab-content">
+          <div class="grid grid-3" id="supplier-cards"></div>
+        </div>
+        <div id="supply-performance" class="supply-tab-content" style="display:none">
+          <div class="card"><div class="card-title mb-16">Supplier Performance Scorecard</div><div class="table-wrap"><table><thead><tr><th>Supplier</th><th>On-Time %</th><th>Quality Rating</th><th>Responsiveness</th><th>Overall</th></tr></thead><tbody id="supplier-perf-body"></tbody></table></div></div>
+        </div>
+        <div id="supply-risk" class="supply-tab-content" style="display:none">
+          <div class="card"><div class="card-title mb-16">Supply Risk Matrix</div><div class="table-wrap"><table><thead><tr><th>Component</th><th>Primary Supplier</th><th>Alt Supplier</th><th>Source Type</th><th>Risk Level</th><th>Mitigation</th></tr></thead><tbody id="risk-table-body"></tbody></table></div></div>
+        </div>
+        <div id="supply-pricing" class="supply-tab-content" style="display:none">
+          <div class="card"><div class="card-title mb-16">Component Price History (6 Months)</div><div class="chart-container"><canvas id="chart-price-trend"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 6: QUALITY & COMPLIANCE
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-quality">
+        <div class="module-title">Quality & Compliance</div>
+        <div class="module-desc">QC dashboard, SPC charts, ITAR compliance, and regulatory tracking</div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="showQualTab('dashboard')">QC Dashboard</button>
+          <button class="tab-btn" onclick="showQualTab('spc')">SPC Charts</button>
+          <button class="tab-btn" onclick="showQualTab('ncr')">NCR Log</button>
+          <button class="tab-btn" onclick="showQualTab('itar')">ITAR Compliance</button>
+          <button class="tab-btn" onclick="showQualTab('checklist')">Checklists</button>
+        </div>
+        <div id="qual-dashboard" class="qual-tab-content">
+          <div class="grid grid-4 mb-24">
+            <div class="card kpi-card"><div class="kpi-value text-green">96.4%</div><div class="kpi-label">Overall Pass Rate</div></div>
+            <div class="card kpi-card"><div class="kpi-value text-green">99.1%</div><div class="kpi-label">A Shift Pass Rate</div></div>
+            <div class="card kpi-card"><div class="kpi-value text-amber">94.8%</div><div class="kpi-label">B Shift Pass Rate</div></div>
+            <div class="card kpi-card"><div class="kpi-value text-green">95.2%</div><div class="kpi-label">C Shift Pass Rate</div></div>
+          </div>
+          <div class="grid grid-2">
+            <div class="card"><div class="card-title mb-16">Pass Rate by Station</div><div class="chart-container"><canvas id="chart-qc-station"></canvas></div></div>
+            <div class="card"><div class="card-title mb-16">QC Inspection Checklist</div>
+              <div style="font-size:13px">
+                <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Dimensional check — OD, length, case mouth diameter</div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Weight check — projectile 230g ±2g, complete round 340g ±3g</div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Visual inspection — surface defects, marking legibility</div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Crimp depth — per MIL-STD gauge</div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Primer protrusion — flush to 0.005" below</div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Fuze torque — 18-22 ft-lbs per spec</div>
+                <div style="padding:8px 0">✅ Function test — 1 per 1,000 per MIL-STD-1916 Level III</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="qual-spc" class="qual-tab-content" style="display:none">
+          <div class="grid grid-2">
+            <div class="card"><div class="card-title mb-16">X-bar Chart — Projectile Weight (g)</div><div class="chart-container"><canvas id="chart-xbar"></canvas></div></div>
+            <div class="card"><div class="card-title mb-16">R Chart — Projectile Weight Range (g)</div><div class="chart-container"><canvas id="chart-rchart"></canvas></div></div>
+          </div>
+        </div>
+        <div id="qual-ncr" class="qual-tab-content" style="display:none">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Non-Conformance Reports</div><button class="btn btn-primary btn-sm" onclick="showModal('ncr-modal')">+ New NCR</button></div>
+            <div class="table-wrap"><table><thead><tr><th>NCR #</th><th>Date</th><th>Lot</th><th>Description</th><th>Qty</th><th>Disposition</th><th>Status</th></tr></thead><tbody>
+              <tr><td>NCR-2026-023</td><td>Mar 10</td><td>0048</td><td>OD out of tolerance (+0.003")</td><td>3</td><td>Scrap</td><td><span class="badge-pill badge-red">Open</span></td></tr>
+              <tr><td>NCR-2026-022</td><td>Mar 10</td><td>0048</td><td>Rotating band misalignment</td><td>7</td><td>Rework</td><td><span class="badge-pill badge-amber">In Progress</span></td></tr>
+              <tr><td>NCR-2026-021</td><td>Mar 9</td><td>0047</td><td>Comp A5 fill weight low (37.8g)</td><td>2</td><td>Scrap</td><td><span class="badge-pill badge-green">Closed</span></td></tr>
+              <tr><td>NCR-2026-020</td><td>Mar 8</td><td>0046</td><td>Primer seating depth shallow</td><td>1</td><td>Scrap</td><td><span class="badge-pill badge-green">Closed</span></td></tr>
+              <tr><td>NCR-2026-019</td><td>Mar 7</td><td>0045</td><td>Crimp depth out of spec</td><td>4</td><td>Rework</td><td><span class="badge-pill badge-green">Closed</span></td></tr>
+            </tbody></table></div>
+          </div>
+        </div>
+        <div id="qual-itar" class="qual-tab-content" style="display:none">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-title mb-16">ITAR Compliance Status</div>
+              <div style="font-size:13px">
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>DDTC Registration</span><span class="badge-pill badge-green">Active — Expires Dec 2026</span></div>
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>Technology Security Plan</span><span class="badge-pill badge-green">Current</span></div>
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>USML Classification</span><span class="badge-pill badge-blue">Category IV(a) — Ammunition</span></div>
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>Annual ITAR Audit</span><span class="badge-pill badge-green">Completed Jan 2026</span></div>
+                <div style="padding:10px 0;display:flex;justify-content:space-between"><span>Foreign Person Screening</span><span class="badge-pill badge-green">0 Foreign Nationals on Site</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title mb-16">Export License Tracker</div>
+              <div class="table-wrap"><table><thead><tr><th>License</th><th>Customer</th><th>Type</th><th>Status</th></tr></thead><tbody>
+                <tr><td>DSP-73-2026-001</td><td>Rafael Adv. Defense</td><td>Temp Export</td><td><span class="badge-pill badge-amber">Pending State Dept.</span></td></tr>
+                <tr><td>DSP-73-2026-002</td><td>IndoDef Corp</td><td>Perm Export</td><td><span class="badge-pill badge-blue">Drafting</span></td></tr>
+              </tbody></table></div>
+              <div class="mt-16 card-title mb-16">ATF/FEL Compliance</div>
+              <div style="font-size:13px">
+                <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Federal Firearms License (FFL) — Type 07 Manufacturer</div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Federal Explosives License (FEL) — Active</div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ SOT Class III — Current</div>
+                <div style="padding:8px 0">✅ State of Montana permits — Current</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="qual-checklist" class="qual-tab-content" style="display:none">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-title mb-16">First Article Test (FAT) Tracker</div>
+              <div class="table-wrap"><table><thead><tr><th>Order</th><th>FAT Date</th><th>Result</th><th>Customer Rep</th></tr></thead><tbody>
+                <tr><td>Colt USA</td><td>Jan 28, 2026</td><td><span class="badge-pill badge-green">Approved</span></td><td>J. Martinez</td></tr>
+                <tr><td>BAE Systems</td><td>Mar 18, 2026</td><td><span class="badge-pill badge-blue">Scheduled</span></td><td>TBD</td></tr>
+              </tbody></table></div>
+            </div>
+            <div class="card">
+              <div class="card-title mb-16">MIL-STD-1916 Sampling Plan</div>
+              <div style="font-size:13px;color:var(--text-dim)">
+                <p class="mb-16">Inspection Level III — Normal inspection for dimensional and weight checks.</p>
+                <div class="table-wrap"><table><thead><tr><th>Lot Size</th><th>Sample Size</th><th>Accept</th><th>Reject</th></tr></thead><tbody>
+                  <tr><td>281–500</td><td>20</td><td>0</td><td>1</td></tr>
+                  <tr><td>501–1200</td><td>32</td><td>0</td><td>1</td></tr>
+                  <tr><td>1201–3200</td><td>50</td><td>1</td><td>2</td></tr>
+                </tbody></table></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 7: FINANCIAL
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-financial">
+        <div class="module-title">Financial Dashboard</div>
+        <div class="module-desc">Revenue, cost analysis, cash flow projections, and P&L</div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="showFinTab('overview')">Overview</button>
+          <button class="tab-btn" onclick="showFinTab('costs')">Cost Analysis</button>
+          <button class="tab-btn" onclick="showFinTab('cashflow')">Cash Flow</button>
+          <button class="tab-btn" onclick="showFinTab('pnl')">P&L</button>
+          <button class="tab-btn" onclick="showFinTab('aging')">AR/AP Aging</button>
+        </div>
+        <div id="fin-overview" class="fin-tab-content">
+          <div class="grid grid-4 mb-24">
+            <div class="card kpi-card"><div class="kpi-value text-green">$46.50</div><div class="kpi-label">Avg Selling Price</div></div>
+            <div class="card kpi-card"><div class="kpi-value text-amber">$41.80</div><div class="kpi-label">Cost Per Round</div></div>
+            <div class="card kpi-card"><div class="kpi-value text-green">$4.70</div><div class="kpi-label">Margin Per Round</div></div>
+            <div class="card kpi-card"><div class="kpi-value text-green">10.1%</div><div class="kpi-label">Gross Margin</div></div>
+          </div>
+          <div class="grid grid-2">
+            <div class="card"><div class="card-title mb-16">Revenue Projection by Order</div><div class="chart-container"><canvas id="chart-revenue-proj"></canvas></div></div>
+            <div class="card"><div class="card-title mb-16">Budget vs Actual (2026)</div><div class="chart-container"><canvas id="chart-budget-actual"></canvas></div></div>
+          </div>
+        </div>
+        <div id="fin-costs" class="fin-tab-content" style="display:none">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-title mb-16">Cost Per Round Breakdown</div>
+              <div style="font-size:13px">
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>Materials</span><strong>$32.00 (76.6%)</strong></div>
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>Direct Labor</span><strong>$4.50 (10.8%)</strong></div>
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>Overhead</span><strong>$3.50 (8.4%)</strong></div>
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>Quality Control</span><strong>$1.00 (2.4%)</strong></div>
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>Packaging</span><strong>$0.80 (1.9%)</strong></div>
+                <div style="padding:10px 0;display:flex;justify-content:space-between;font-weight:700;color:var(--amber)"><span>TOTAL</span><strong>$41.80</strong></div>
+              </div>
+            </div>
+            <div class="card"><div class="card-title mb-16">Break-Even Analysis</div>
+              <div style="font-size:13px;color:var(--text-dim)" class="mb-16">
+                <p>Fixed Monthly Costs: <strong style="color:var(--text)">$185,000</strong> (facility, equipment depreciation, insurance, admin)</p>
+                <p class="mt-8">Variable Cost/Round: <strong style="color:var(--text)">$41.80</strong></p>
+                <p class="mt-8">Avg Selling Price: <strong style="color:var(--text)">$46.50</strong></p>
+                <p class="mt-8">Contribution Margin: <strong style="color:var(--green)">$4.70/rd</strong></p>
+                <p class="mt-8">Break-Even Volume: <strong style="color:var(--amber)">39,362 rounds/month</strong></p>
+              </div>
+              <div class="chart-container"><canvas id="chart-breakeven"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div id="fin-cashflow" class="fin-tab-content" style="display:none">
+          <div class="card"><div class="card-title mb-16">Cash Flow Projection (6 Months)</div><div class="chart-container" style="height:320px"><canvas id="chart-cashflow"></canvas></div></div>
+        </div>
+        <div id="fin-pnl" class="fin-tab-content" style="display:none">
+          <div class="card">
+            <div class="card-title mb-16">Profit & Loss Summary — March 2026 (Projected)</div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Line Item</th><th>Amount</th><th>% of Revenue</th></tr></thead>
+              <tbody>
+                <tr style="font-weight:700"><td>Revenue</td><td style="color:var(--green)">$597,381</td><td>100%</td></tr>
+                <tr><td>  Cost of Goods Sold</td><td style="color:var(--red)">($537,294)</td><td>89.9%</td></tr>
+                <tr style="font-weight:700;border-top:2px solid var(--border)"><td>Gross Profit</td><td style="color:var(--green)">$60,087</td><td>10.1%</td></tr>
+                <tr><td>  SG&A</td><td>($28,000)</td><td>4.7%</td></tr>
+                <tr><td>  Facility & Utilities</td><td>($22,000)</td><td>3.7%</td></tr>
+                <tr><td>  Insurance</td><td>($8,500)</td><td>1.4%</td></tr>
+                <tr><td>  Depreciation</td><td>($6,200)</td><td>1.0%</td></tr>
+                <tr style="font-weight:700;border-top:2px solid var(--border)"><td>Operating Income (Loss)</td><td style="color:var(--red)">($4,613)</td><td>-0.8%</td></tr>
+              </tbody>
+            </table></div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:12px">Note: Ramp-up phase — at full 2-line, 3-shift production, monthly revenue reaches $1.18M with 5.2% net margin.</div>
+          </div>
+        </div>
+        <div id="fin-aging" class="fin-tab-content" style="display:none">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-title mb-16">Accounts Receivable Aging</div>
+              <div class="table-wrap"><table><thead><tr><th>Customer</th><th>Current</th><th>1-30</th><th>31-60</th><th>60+</th><th>Total</th></tr></thead><tbody>
+                <tr><td>Colt USA</td><td>$712,500</td><td>$0</td><td>$0</td><td>$0</td><td>$712,500</td></tr>
+                <tr><td>BAE Systems</td><td>$900,000</td><td>$0</td><td>$0</td><td>$0</td><td>$900,000</td></tr>
+                <tr style="font-weight:700"><td>TOTAL</td><td>$1,612,500</td><td>$0</td><td>$0</td><td>$0</td><td>$1,612,500</td></tr>
+              </tbody></table></div>
+            </div>
+            <div class="card">
+              <div class="card-title mb-16">Accounts Payable Aging</div>
+              <div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Current</th><th>1-30</th><th>31-60</th><th>60+</th><th>Total</th></tr></thead><tbody>
+                <tr><td>Amtec Less Lethal</td><td>$48,000</td><td>$0</td><td>$0</td><td>$0</td><td>$48,000</td></tr>
+                <tr><td>Chemring Group</td><td>$127,500</td><td>$34,000</td><td>$0</td><td>$0</td><td>$161,500</td></tr>
+                <tr><td>General Dynamics OTS</td><td>$36,000</td><td>$0</td><td>$0</td><td>$0</td><td>$36,000</td></tr>
+                <tr><td>Other</td><td>$52,300</td><td>$18,200</td><td>$0</td><td>$0</td><td>$70,500</td></tr>
+                <tr style="font-weight:700"><td>TOTAL</td><td>$263,800</td><td>$52,200</td><td>$0</td><td>$0</td><td>$316,000</td></tr>
+              </tbody></table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 8: LOGISTICS & SHIPPING
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-logistics">
+        <div class="module-title">Logistics & Shipping</div>
+        <div class="module-desc">Shipment tracking, export documentation, and carrier management</div>
+
+        <div class="grid grid-3 mb-24">
+          <div class="card kpi-card"><div class="kpi-icon">📦</div><div class="kpi-value">3</div><div class="kpi-label">Active Shipments</div></div>
+          <div class="card kpi-card"><div class="kpi-icon">✈️</div><div class="kpi-value text-green">12</div><div class="kpi-label">Completed YTD</div></div>
+          <div class="card kpi-card"><div class="kpi-icon">⏱️</div><div class="kpi-value text-amber">98.2%</div><div class="kpi-label">On-Time Rate</div></div>
+        </div>
+
+        <div class="card mb-24">
+          <div class="card-title mb-16">Shipment Tracker</div>
+          <div class="table-wrap"><table><thead><tr><th>Shipment ID</th><th>Customer</th><th>Qty</th><th>Carrier</th><th>Status</th><th>ETA</th></tr></thead><tbody>
+            <tr><td>SHP-2026-015</td><td>Colt USA</td><td>5,000 rds</td><td>FedEx Custom Critical</td><td>
+              <div style="display:flex;gap:4px;align-items:center">
+                <span style="padding:2px 6px;background:rgba(0,255,136,.15);color:var(--green);border-radius:3px;font-size:10px">Packaging</span>
+                <span style="color:var(--green)">✓</span>
+                <span style="padding:2px 6px;background:rgba(0,255,136,.15);color:var(--green);border-radius:3px;font-size:10px">Hazmat</span>
+                <span style="color:var(--green)">✓</span>
+                <span style="padding:2px 6px;background:rgba(59,130,246,.15);color:var(--blue);border-radius:3px;font-size:10px;font-weight:700">Export Docs</span>
+                <span style="color:var(--text-muted)">○</span>
+                <span style="padding:2px 6px;background:rgba(30,42,74,.5);color:var(--text-muted);border-radius:3px;font-size:10px">Pickup</span>
+                <span style="color:var(--text-muted)">○</span>
+                <span style="padding:2px 6px;background:rgba(30,42,74,.5);color:var(--text-muted);border-radius:3px;font-size:10px">Transit</span>
+              </div>
+            </td><td>Mar 18</td></tr>
+            <tr><td>SHP-2026-014</td><td>Colt USA</td><td>5,000 rds</td><td>Estes Express</td><td><span class="badge-pill badge-green">In Transit</span></td><td>Mar 12</td></tr>
+            <tr><td>SHP-2026-013</td><td>Colt USA</td><td>2,000 rds</td><td>XPO Logistics</td><td><span class="badge-pill badge-green">Delivered ✓</span></td><td>Delivered Mar 8</td></tr>
+          </tbody></table></div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-title mb-16">Hazmat Shipping Compliance</div>
+            <div style="font-size:13px">
+              <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ DOT Classification: Class 1.4S — Ammunition for weapons</div>
+              <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ UN Number: UN0012</div>
+              <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Proper Shipping Name: Cartridges for weapons, inert projectile</div>
+              <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Packing Group: None (1.4S)</div>
+              <div style="padding:8px 0;border-bottom:1px solid var(--border)">✅ Hazmat employee training — Current (all shipping personnel)</div>
+              <div style="padding:8px 0">✅ Emergency response info in shipping papers</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title mb-16">Export Documentation Status</div>
+            <div class="table-wrap"><table><thead><tr><th>Document</th><th>Shipment</th><th>Status</th></tr></thead><tbody>
+              <tr><td>FFL Transfer Record</td><td>SHP-2026-015</td><td><span class="badge-pill badge-green">Complete</span></td></tr>
+              <tr><td>Commercial Invoice</td><td>SHP-2026-015</td><td><span class="badge-pill badge-green">Complete</span></td></tr>
+              <tr><td>Packing List</td><td>SHP-2026-015</td><td><span class="badge-pill badge-green">Complete</span></td></tr>
+              <tr><td>Shipper's Export Declaration</td><td>SHP-2026-015</td><td><span class="badge-pill badge-amber">In Progress</span></td></tr>
+              <tr><td>End-User Certificate</td><td>SHP-2026-015</td><td><span class="badge-pill badge-green">On File</span></td></tr>
+            </tbody></table></div>
+          </div>
+        </div>
+
+        <div class="card mt-24">
+          <div class="card-title mb-16">Carrier Management</div>
+          <div class="grid grid-3">
+            <div style="padding:12px;background:var(--bg2);border-radius:var(--radius-sm)">
+              <div style="font-weight:700">FedEx Custom Critical</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Hazmat certified • Temperature controlled</div>
+              <div style="font-size:11px;color:var(--text-dim)">Contact: 1-800-332-0807</div>
+              <div style="margin-top:8px"><span class="badge-pill badge-green">Preferred</span></div>
+            </div>
+            <div style="padding:12px;background:var(--bg2);border-radius:var(--radius-sm)">
+              <div style="font-weight:700">Estes Express</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:4px">LTL • Hazmat endorsed</div>
+              <div style="font-size:11px;color:var(--text-dim)">Contact: 1-866-378-3748</div>
+              <div style="margin-top:8px"><span class="badge-pill badge-blue">Active</span></div>
+            </div>
+            <div style="padding:12px;background:var(--bg2);border-radius:var(--radius-sm)">
+              <div style="font-weight:700">XPO Logistics</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:4px">FTL • Oversized loads</div>
+              <div style="font-size:11px;color:var(--text-dim)">Contact: 1-844-742-5976</div>
+              <div style="margin-top:8px"><span class="badge-pill badge-blue">Active</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 9: TEAM & COMMUNICATIONS
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-team">
+        <div class="module-title">Team & Communications</div>
+        <div class="module-desc">Organization directory, action items, and activity feed</div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="showTeamTab('org')">Org Chart</button>
+          <button class="tab-btn" onclick="showTeamTab('actions')">Action Items</button>
+          <button class="tab-btn" onclick="showTeamTab('activity')">Activity Feed</button>
+          <button class="tab-btn" onclick="showTeamTab('contacts')">Key Contacts</button>
+        </div>
+        <div id="team-org" class="team-tab-content">
+          <div class="grid grid-3" id="team-cards-container"></div>
+        </div>
+        <div id="team-actions" class="team-tab-content" style="display:none">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Action Items</div><button class="btn btn-primary btn-sm" onclick="showModal('action-modal')">+ New Item</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Item</th><th>Assignee</th><th>Due</th><th>Priority</th><th>Status</th></tr></thead><tbody>
+              <tr><td>Finalize BAE Systems FAT schedule</td><td>Brandon Longer</td><td>Mar 15</td><td><span class="badge-pill badge-red">High</span></td><td><span class="badge-pill badge-amber">In Progress</span></td></tr>
+              <tr><td>Order M550A1 Fuzes (emergency reorder)</td><td>Rich Goff</td><td>Mar 11</td><td><span class="badge-pill badge-red">Critical</span></td><td><span class="badge-pill badge-amber">In Progress</span></td></tr>
+              <tr><td>Schedule Line 2 maintenance</td><td>Production Mgr</td><td>Mar 15</td><td><span class="badge-pill badge-amber">Medium</span></td><td><span class="badge-pill badge-green">Done</span></td></tr>
+              <tr><td>Rafael export license application</td><td>Danny Coulson</td><td>Mar 20</td><td><span class="badge-pill badge-red">High</span></td><td><span class="badge-pill badge-blue">Not Started</span></td></tr>
+              <tr><td>Update safety procedures for Stn 4</td><td>QC Lead</td><td>Mar 22</td><td><span class="badge-pill badge-amber">Medium</span></td><td><span class="badge-pill badge-blue">Not Started</span></td></tr>
+              <tr><td>IndoDef pricing negotiation prep</td><td>Brandon Longer</td><td>Mar 25</td><td><span class="badge-pill badge-amber">Medium</span></td><td><span class="badge-pill badge-blue">Not Started</span></td></tr>
+            </tbody></table></div>
+          </div>
+        </div>
+        <div id="team-activity" class="team-tab-content" style="display:none">
+          <div class="card">
+            <div class="card-title mb-16">Activity Feed</div>
+            <div id="activity-feed"></div>
+          </div>
+        </div>
+        <div id="team-contacts" class="team-tab-content" style="display:none">
+          <div class="card">
+            <div class="card-title mb-16">Key External Contacts</div>
+            <div class="table-wrap"><table><thead><tr><th>Name</th><th>Organization</th><th>Role</th><th>Phone</th><th>Email</th></tr></thead><tbody>
+              <tr><td>J. Martinez</td><td>Colt USA</td><td>Procurement</td><td>(860) 555-0142</td><td>j.martinez@colt.com</td></tr>
+              <tr><td>S. Richardson</td><td>BAE Systems</td><td>Contracts</td><td>(703) 555-0198</td><td>s.richardson@baesystems.com</td></tr>
+              <tr><td>D. Cohen</td><td>Rafael Adv. Defense</td><td>Int'l Sales</td><td>+972-4-555-0100</td><td>d.cohen@rafael.co.il</td></tr>
+              <tr><td>ATF Field Office</td><td>ATF — Montana</td><td>Regulatory</td><td>(406) 555-0187</td><td>—</td></tr>
+              <tr><td>DDTC Licensing</td><td>State Department</td><td>Export Control</td><td>(202) 555-0163</td><td>—</td></tr>
+            </tbody></table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 10: ANALYTICS & REPORTING
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-analytics">
+        <div class="module-title">Analytics & Reporting</div>
+        <div class="module-desc">Production analytics, yield analysis, and exportable reports</div>
+        <div class="grid grid-2 mb-24">
+          <div class="card"><div class="card-title mb-16">Daily OEE Trend (30 Days)</div><div class="chart-container"><canvas id="chart-oee-trend"></canvas></div></div>
+          <div class="card"><div class="card-title mb-16">Planned vs Actual Production</div><div class="chart-container"><canvas id="chart-plan-actual"></canvas></div></div>
+        </div>
+        <div class="grid grid-2 mb-24">
+          <div class="card"><div class="card-title mb-16">Downtime Pareto Analysis</div><div class="chart-container"><canvas id="chart-downtime"></canvas></div></div>
+          <div class="card"><div class="card-title mb-16">Cost Trend (6 Months)</div><div class="chart-container"><canvas id="chart-cost-trend"></canvas></div></div>
+        </div>
+        <div class="card mb-24">
+          <div class="card-title mb-16">KPI Scoreboard — March 2026</div>
+          <div class="table-wrap"><table><thead><tr><th>KPI</th><th>Current Month</th><th>Prior Month</th><th>Target</th><th>Trend</th></tr></thead><tbody>
+            <tr><td>Units Produced</td><td style="font-weight:700">12,847</td><td>11,230</td><td>12,000</td><td><span class="text-green">↑ 14.4%</span></td></tr>
+            <tr><td>OEE</td><td style="font-weight:700">87.3%</td><td>85.1%</td><td>85%</td><td><span class="text-green">↑ 2.2pts</span></td></tr>
+            <tr><td>First Pass Yield</td><td style="font-weight:700">96.4%</td><td>95.8%</td><td>96%</td><td><span class="text-green">↑ 0.6pts</span></td></tr>
+            <tr><td>On-Time Delivery</td><td style="font-weight:700">98.2%</td><td>97.5%</td><td>98%</td><td><span class="text-green">↑ 0.7pts</span></td></tr>
+            <tr><td>Cost Per Round</td><td style="font-weight:700">$41.80</td><td>$42.10</td><td>$42.00</td><td><span class="text-green">↓ $0.30</span></td></tr>
+            <tr><td>Scrap Rate</td><td style="font-weight:700">0.8%</td><td>1.1%</td><td>1.0%</td><td><span class="text-green">↓ 0.3pts</span></td></tr>
+          </tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="card-title mb-16">Export Reports</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="alert('PDF export would generate here')">📄 Production Report (PDF)</button>
+            <button class="btn btn-outline" onclick="alert('CSV export would generate here')">📊 Production Data (CSV)</button>
+            <button class="btn btn-outline" onclick="alert('PDF export would generate here')">📄 Quality Report (PDF)</button>
+            <button class="btn btn-outline" onclick="alert('CSV export would generate here')">📊 Financial Summary (CSV)</button>
+            <button class="btn btn-outline" onclick="alert('PDF export would generate here')">📄 Inventory Report (PDF)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 11: M433A1 TECHNICAL REFERENCE
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-techref">
+        <div class="module-title">M433A1 HEDP Technical Reference</div>
+        <div class="module-desc">Interactive cross-section, specifications, and assembly process</div>
+
+        <div class="grid grid-2 mb-24">
+          <div class="card">
+            <div class="card-title mb-16">Cross-Section Diagram — Click any component</div>
+            <svg id="m433-diagram" viewBox="0 0 500 600" style="width:100%;max-width:460px;margin:0 auto;display:block">
+              <!-- Round outline -->
+              <defs>
+                <linearGradient id="metalGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4a5568"/><stop offset="50%" stop-color="#718096"/><stop offset="100%" stop-color="#4a5568"/></linearGradient>
+                <linearGradient id="copperGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#b87333"/><stop offset="50%" stop-color="#da8a47"/><stop offset="100%" stop-color="#b87333"/></linearGradient>
+                <linearGradient id="brassGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c5a55a"/><stop offset="50%" stop-color="#d4b96a"/><stop offset="100%" stop-color="#c5a55a"/></linearGradient>
+                <linearGradient id="oliveGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#556b2f"/><stop offset="50%" stop-color="#6b8e23"/><stop offset="100%" stop-color="#556b2f"/></linearGradient>
+              </defs>
+              <!-- Fuze -->
+              <g class="round-part" data-part="fuze" onclick="showPartDetail('fuze')">
+                <ellipse cx="250" cy="62" rx="28" ry="28" fill="url(#metalGrad)" stroke="#2d3748" stroke-width="2"/>
+                <rect x="232" y="82" width="36" height="20" rx="3" fill="url(#metalGrad)" stroke="#2d3748" stroke-width="1.5"/>
+                <text x="250" y="67" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="700">M550A1</text>
+                <text x="250" y="77" text-anchor="middle" fill="#a0aec0" font-size="7">PD FUZE</text>
+              </g>
+              <!-- Ogive / Plastic body -->
+              <g class="round-part" data-part="ogive" onclick="showPartDetail('ogive')">
+                <path d="M 215 100 Q 215 130 210 170 L 290 170 Q 285 130 285 100 Z" fill="url(#oliveGrad)" stroke="#2d3748" stroke-width="2"/>
+                <text x="250" y="140" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600">PLASTIC</text>
+                <text x="250" y="152" text-anchor="middle" fill="#a0aec0" font-size="8">OGIVE</text>
+              </g>
+              <!-- Tungsten fragments -->
+              <g class="round-part" data-part="tungsten" onclick="showPartDetail('tungsten')">
+                <rect x="218" y="114" width="64" height="16" rx="2" fill="#8B8682" opacity=".7" stroke="#2d3748" stroke-width="1"/>
+                <text x="250" y="126" text-anchor="middle" fill="#fff" font-size="7" font-weight="600">W FRAGMENTS</text>
+              </g>
+              <!-- Shaped charge liner -->
+              <g class="round-part" data-part="liner" onclick="showPartDetail('liner')">
+                <path d="M 220 170 L 250 210 L 280 170 Z" fill="url(#copperGrad)" stroke="#2d3748" stroke-width="2"/>
+                <text x="250" y="192" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">Cu LINER</text>
+              </g>
+              <!-- Comp A5 fill -->
+              <g class="round-part" data-part="explosive" onclick="showPartDetail('explosive')">
+                <rect x="212" y="210" width="76" height="60" rx="4" fill="#c53030" opacity=".8" stroke="#2d3748" stroke-width="2"/>
+                <text x="250" y="236" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">COMP A5</text>
+                <text x="250" y="250" text-anchor="middle" fill="#fed7d7" font-size="7">39g RDX/Wax</text>
+                <text x="250" y="262" text-anchor="middle" fill="#fed7d7" font-size="7">EXPLOSIVE FILL</text>
+              </g>
+              <!-- Steel frag body -->
+              <g class="round-part" data-part="fragbody" onclick="showPartDetail('fragbody')">
+                <rect x="204" y="165" width="92" height="115" rx="6" fill="none" stroke="#a0aec0" stroke-width="3" stroke-dasharray="4,3"/>
+                <text x="300" y="225" fill="#a0aec0" font-size="8" font-weight="600">STEEL</text>
+                <text x="300" y="236" fill="#a0aec0" font-size="7">FRAG BODY</text>
+              </g>
+              <!-- Rotating band -->
+              <g class="round-part" data-part="band" onclick="showPartDetail('band')">
+                <rect x="200" y="278" width="100" height="14" rx="7" fill="url(#copperGrad)" stroke="#2d3748" stroke-width="2"/>
+                <text x="250" y="289" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">ROTATING BAND</text>
+              </g>
+              <!-- Cartridge case -->
+              <g class="round-part" data-part="case" onclick="showPartDetail('case')">
+                <path d="M 208 295 L 200 440 L 210 460 L 290 460 L 300 440 L 292 295 Z" fill="url(#brassGrad)" stroke="#2d3748" stroke-width="2"/>
+                <text x="250" y="370" text-anchor="middle" fill="#2d3748" font-size="10" font-weight="700">M118A1</text>
+                <text x="250" y="385" text-anchor="middle" fill="#4a5568" font-size="8">ALUMINUM CASE</text>
+                <text x="250" y="398" text-anchor="middle" fill="#4a5568" font-size="7">6061-T6</text>
+              </g>
+              <!-- Propellant -->
+              <g class="round-part" data-part="propellant" onclick="showPartDetail('propellant')">
+                <rect x="224" y="415" width="52" height="24" rx="3" fill="#2d3748" stroke="#4a5568" stroke-width="1.5"/>
+                <text x="250" y="431" text-anchor="middle" fill="#a0aec0" font-size="7" font-weight="600">M2 PROPELLANT</text>
+              </g>
+              <!-- Primer -->
+              <g class="round-part" data-part="primer" onclick="showPartDetail('primer')">
+                <circle cx="250" cy="470" r="12" fill="#e53e3e" stroke="#2d3748" stroke-width="2"/>
+                <text x="250" y="474" text-anchor="middle" fill="#fff" font-size="7" font-weight="700">PRIMER</text>
+                <text x="250" y="496" text-anchor="middle" fill="#a0aec0" font-size="7">M42A1</text>
+              </g>
+              <!-- Dimension lines -->
+              <line x1="160" y1="55" x2="160" y2="485" stroke="#4a5568" stroke-width="1" stroke-dasharray="3,3"/>
+              <text x="155" y="270" text-anchor="end" fill="#718096" font-size="9" transform="rotate(-90,155,270)">40×46mm — 340g complete</text>
+            </svg>
+          </div>
+          <div class="card">
+            <div class="card-title mb-16">Component Detail</div>
+            <div id="part-detail" style="font-size:13px;color:var(--text-dim)">
+              <p style="text-align:center;padding:40px 0">← Click a component on the diagram to view details</p>
+            </div>
+            <div class="mt-24">
+              <div class="card-title mb-16">Quick Reference</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Caliber:</span> 40×46mm LV</div>
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Type:</span> HEDP</div>
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Projectile:</span> 230g</div>
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Complete:</span> 340g</div>
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Muzzle Vel:</span> 76 m/s</div>
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Max Range:</span> 400m</div>
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Penetration:</span> 63mm (2.5")</div>
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Casualty R:</span> 15m</div>
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Explosive:</span> Comp A5 (39g)</div>
+                <div style="padding:8px;background:var(--bg2);border-radius:4px"><span class="text-dim">Fuze:</span> M550A1 PD</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-16">Assembly Process — Step Through</div>
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <button class="btn btn-outline btn-sm" id="asm-prev" onclick="asmStep(-1)">← Previous</button>
+            <button class="btn btn-primary btn-sm" id="asm-next" onclick="asmStep(1)">Next →</button>
+            <span style="margin-left:auto;font-size:12px;color:var(--text-dim)" id="asm-counter">Step 1 of 9</span>
+          </div>
+          <div id="asm-step-display" class="card" style="background:var(--bg2);border:1px solid var(--border)"></div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           MODULE 12: SAFETY & ENVIRONMENTAL
+           ════════════════════════════════════════ -->
+      <div class="module" id="mod-safety">
+        <div class="module-title">Safety & Environmental</div>
+        <div class="module-desc">Explosive safety, PPE requirements, environmental monitoring</div>
+        <div class="grid grid-2 mb-24">
+          <div class="card">
+            <div class="card-title mb-16">Explosive Safety Distances</div>
+            <div class="table-wrap"><table><thead><tr><th>Quantity (NEW)</th><th>IBD (ft)</th><th>Magazine Dist (ft)</th><th>Public Road (ft)</th></tr></thead><tbody>
+              <tr><td>Up to 1,000 lbs</td><td>1,250</td><td>400</td><td>600</td></tr>
+              <tr><td>1,001–5,000 lbs</td><td>1,500</td><td>600</td><td>800</td></tr>
+              <tr><td>5,001–10,000 lbs</td><td>1,800</td><td>800</td><td>1,000</td></tr>
+            </tbody></table></div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:8px">Per DoD 6055.09-M, DESR 6055.09</div>
+          </div>
+          <div class="card">
+            <div>
+            <h3 style="margin-bottom:12px">Environmental Monitoring</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+              <div class="card" style="text-align:center;padding:16px"><div style="font-size:11px;color:var(--text-dim)">PRODUCTION AREA TEMP</div><div style="font-size:28px;font-weight:700;color:var(--success)">72°F</div><div style="font-size:11px;color:var(--text-dim)">Range: 65-80°F ✓</div></div>
+              <div class="card" style="text-align:center;padding:16px"><div style="font-size:11px;color:var(--text-dim)">HUMIDITY</div><div style="font-size:28px;font-weight:700;color:var(--success)">42%</div><div style="font-size:11px;color:var(--text-dim)">Range: 30-60% ✓</div></div>
+              <div class="card" style="text-align:center;padding:16px"><div style="font-size:11px;color:var(--text-dim)">STATIC POTENTIAL</div><div style="font-size:28px;font-weight:700;color:var(--success)">< 100V</div><div style="font-size:11px;color:var(--text-dim)">Max: 500V ✓</div></div>
+              <div class="card" style="text-align:center;padding:16px"><div style="font-size:11px;color:var(--text-dim)">AIR QUALITY</div><div style="font-size:28px;font-weight:700;color:var(--success)">GOOD</div><div style="font-size:11px;color:var(--text-dim)">Last test: Today 0800</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Document Center -->
+      <div id="mod-documents" class="module" style="display:none">
+        <h2 style="margin-bottom:20px;font-size:20px">📁 Document Center</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+          <div class="card" style="cursor:pointer" onclick="this.querySelector('.doc-list').style.display=this.querySelector('.doc-list').style.display==='none'?'block':'none'">
+            <h3>📋 Licenses & Permits</h3>
+            <div class="doc-list" style="display:none;margin-top:12px;font-size:13px">
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">✅ Federal Explosives License (FEL) — Type 20</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">✅ ITAR Registration (DDTC)</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">✅ Montana State Explosives Permit</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">✅ Business License — Flathead County</div>
+              <div style="padding:6px 0">⚠️ EPA Air Quality Permit — Pending</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="this.querySelector('.doc-list').style.display=this.querySelector('.doc-list').style.display==='none'?'block':'none'">
+            <h3>📊 Quality Documents</h3>
+            <div class="doc-list" style="display:none;margin-top:12px;font-size:13px">
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">Quality Management System Manual v2.1</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">Inspection Procedures — M433A1</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">MIL-STD-1916 Sampling Plan Reference</div>
+              <div style="padding:6px 0">SPC Control Chart Templates</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="this.querySelector('.doc-list').style.display=this.querySelector('.doc-list').style.display==='none'?'block':'none'">
+            <h3>⚠️ Safety Documents</h3>
+            <div class="doc-list" style="display:none;margin-top:12px;font-size:13px">
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">Explosive Safety Site Plan</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">Emergency Response Procedures</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">MSDS — Comp A5</div>
+              <div style="padding:6px 0">PPE Requirements Matrix</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="this.querySelector('.doc-list').style.display=this.querySelector('.doc-list').style.display==='none'?'block':'none'">
+            <h3>📃 Customer Contracts</h3>
+            <div class="doc-list" style="display:none;margin-top:12px;font-size:13px">
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">Colt USA — PO #CU-2026-0847</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">BAE Systems — Contract #BAE-40MM-2026</div>
+              <div style="padding:6px 0">Rafael — Quote #RAF-Q-2026-112</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="this.querySelector('.doc-list').style.display=this.querySelector('.doc-list').style.display==='none'?'block':'none'">
+            <h3>🚚 Export Documentation</h3>
+            <div class="doc-list" style="display:none;margin-top:12px;font-size:13px">
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">DSP-73 Export License Templates</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">End-User Certificate Templates</div>
+              <div style="padding:6px 0">Shipper's Export Declaration Guide</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="this.querySelector('.doc-list').style.display=this.querySelector('.doc-list').style.display==='none'?'block':'none'">
+            <h3>🏭 Production Records</h3>
+            <div class="doc-list" style="display:none;margin-top:12px;font-size:13px">
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">Lot GC-2026-001 — Production Record</div>
+              <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">Lot GC-2026-002 — Production Record</div>
+              <div style="padding:6px 0">Lot GC-2026-003 — In Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div id="mod-settings" class="module" style="display:none">
+        <h2 style="margin-bottom:20px;font-size:20px">⚙️ System Settings</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:16px">
+          <div class="card">
+            <h3 style="margin-bottom:12px">API Integrations</h3>
+            <div style="font-size:13px">
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>QuickBooks Online</span><span style="color:var(--success)">● Connected</span></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>SAM.gov</span><span style="color:var(--success)">● Connected</span></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>FedEx Shipping API</span><span style="color:var(--warning)">● Pending Setup</span></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0"><span>DCMA Portal</span><span style="color:var(--text-dim)">● Not Connected</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 style="margin-bottom:12px">System Status</h3>
+            <div style="font-size:13px">
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>Last Backup</span><span style="color:var(--success)">Today 03:00 UTC</span></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>Database Size</span><span>2.4 GB</span></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>Uptime</span><span style="color:var(--success)">99.97%</span></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0"><span>Version</span><span>GCDL-MC v3.0.1</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 style="margin-bottom:12px">Audit Log (Recent)</h3>
+            <div style="font-size:12px;color:var(--text-dim)">
+              <div style="padding:4px 0">23:45 — B. Longer updated production schedule</div>
+              <div style="padding:4px 0">23:30 — System generated inventory alert (Fuzes below reorder point)</div>
+              <div style="padding:4px 0">22:15 — D. Coulson viewed financial dashboard</div>
+              <div style="padding:4px 0">21:00 — R. Goff approved PO #GC-PO-2026-009</div>
+              <div style="padding:4px 0">20:30 — System backup completed successfully</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 style="margin-bottom:12px">User Management</h3>
+            <div style="font-size:13px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>Danny Coulson</span><span style="background:var(--danger);padding:2px 8px;border-radius:4px;font-size:11px">Admin</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>Rich Goff</span><span style="background:var(--danger);padding:2px 8px;border-radius:4px;font-size:11px">Admin</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>Brandon Longer</span><span style="background:var(--danger);padding:2px 8px;border-radius:4px;font-size:11px">Admin</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>Rosemary Goff</span><span style="background:var(--primary);padding:2px 8px;border-radius:4px;font-size:11px">Manager</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0"><span>John Denman</span><span style="background:var(--text-dim);padding:2px 8px;border-radius:4px;font-size:11px">Viewer</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+  // Initialize
+  function showModule(id) {
+    document.querySelectorAll('.module').forEach(m => m.style.display = 'none');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const mod = document.getElementById('mod-' + id);
+    if(mod) mod.style.display = 'block';
+    event?.target?.closest?.('.nav-item')?.classList.add('active');
+  }
+  // Show dashboard by default
+  document.getElementById('mod-dashboard').style.display = 'block';
+  // Clock
+  setInterval(() => {
+    const now = new Date();
+    const el = document.getElementById('live-clock');
+    if(el) el.textContent = now.toUTCString().split(' ').slice(1).join(' ');
+  }, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Longer Industries — Access</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0c10;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.gate {
+  text-align: center;
+  padding: 3rem;
+  border: 1px solid #1a3a1a;
+  border-radius: 12px;
+  background: #0d1117;
+  box-shadow: 0 0 40px rgba(0, 255, 65, 0.05);
+  max-width: 420px;
+  width: 90%;
+}
+.logo {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #00ff41;
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  color: #666;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 2rem;
+}
+input[type="password"] {
+  width: 100%;
+  padding: 14px 18px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input[type="password"]:focus {
+  border-color: #00ff41;
+}
+button {
+  width: 100%;
+  padding: 14px;
+  background: #00ff41;
+  color: #0a0c10;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: background 0.2s;
+}
+button:hover { background: #00cc33; }
+.error {
+  color: #ff4444;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  display: none;
+}
+</style>
+</head>
+<body>
+<div class="gate">
+  <div class="logo">LI</div>
+  <div class="subtitle">Longer Industries</div>
+  <form onsubmit="return checkAuth()">
+    <input type="password" id="pwd" placeholder="Enter access code" autofocus>
+    <button type="submit">ACCESS</button>
+  </form>
+  <div class="error" id="err">Access denied.</div>
+</div>
+<script>
+const HASH = '353822245bc5a690abd7a2cfbb0f1023d588b68f4e72f7446f6f356ae8107771';
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+async function checkAuth() {
+  const pwd = document.getElementById('pwd').value;
+  const hash = await sha256(pwd);
+  if (hash === HASH) {
+    sessionStorage.setItem('li_auth', '1');
+    window.location.href = 'index.html';
+  } else {
+    document.getElementById('err').style.display = 'block';
+    document.getElementById('pwd').value = '';
+  }
+  return false;
+}
+if (sessionStorage.getItem('li_auth') === '1') window.location.href = 'index.html';
+</script>
+</body>
+</html>

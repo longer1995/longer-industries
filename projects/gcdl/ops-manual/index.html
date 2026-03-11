@@ -1,0 +1,2382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M433A1 HEDP Production Operations Manual — GCDL Defense</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ========== RESET & BASE ========== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--bg2:#0d1221;--card:#131a2e;--card2:#182240;--card3:#1e2a4a;
+  --accent:#00ff88;--accent2:#00cc6a;--accent-dim:rgba(0,255,136,.12);
+  --red:#ff4757;--red-dim:rgba(255,71,87,.15);--yellow:#ffc107;--yellow-dim:rgba(255,193,7,.12);
+  --blue:#4dabf7;--purple:#b197fc;--orange:#ff922b;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--border:#1e293b;--border2:#2d3a56;
+  --sidebar-w:280px;--header-h:56px;
+  --radius:8px;--radius2:12px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --transition:all .25s ease;
+}
+html{scroll-behavior:smooth;font-size:15px;scrollbar-width:thin;scrollbar-color:var(--border2) var(--bg)}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+a{color:var(--accent);text-decoration:none;transition:color .2s}a:hover{color:var(--accent2)}
+code,.mono{font-family:'JetBrains Mono',monospace}
+h1,h2,h3,h4{color:#fff;font-weight:700;line-height:1.3}
+h1{font-size:1.8rem}h2{font-size:1.5rem}h3{font-size:1.2rem}h4{font-size:1.05rem}
+table{width:100%;border-collapse:collapse;margin:1rem 0}
+th,td{padding:.6rem .8rem;text-align:left;border-bottom:1px solid var(--border)}
+th{background:var(--card2);color:var(--accent);font-weight:600;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px}
+td{font-size:.9rem}
+tr:hover td{background:rgba(0,255,136,.03)}
+input,select,textarea{font-family:inherit;font-size:.9rem;background:var(--card);color:var(--text);border:1px solid var(--border2);border-radius:var(--radius);padding:.5rem .75rem;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent)}
+button,.btn{font-family:inherit;cursor:pointer;border:none;border-radius:var(--radius);padding:.5rem 1rem;font-weight:600;font-size:.85rem;transition:var(--transition)}
+.btn-primary{background:var(--accent);color:#000}.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--card2);color:var(--text);border:1px solid var(--border2)}.btn-secondary:hover{background:var(--card3)}
+
+/* ========== LAYOUT ========== */
+#header{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.25rem;z-index:1000;gap:1rem}
+#header .logo{display:flex;align-items:center;gap:.75rem;font-weight:800;font-size:1.1rem;color:#fff;white-space:nowrap}
+#header .logo .shield{width:32px;height:32px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.75rem}
+#header .doc-title{color:var(--text2);font-size:.85rem;border-left:1px solid var(--border2);padding-left:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#header .search-wrap{flex:1;max-width:400px;margin-left:auto;position:relative}
+#header .search-wrap input{width:100%;padding-left:2.2rem;background:var(--card);border:1px solid var(--border)}
+#header .search-wrap .search-icon{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+#header .menu-toggle{display:none;background:none;color:var(--text);font-size:1.4rem;padding:.25rem}
+#breadcrumb{position:fixed;top:var(--header-h);left:var(--sidebar-w);right:0;height:36px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;font-size:.8rem;color:var(--text3);z-index:999;gap:.5rem}
+#breadcrumb span.sep{color:var(--border2)}
+#breadcrumb .crumb-active{color:var(--accent)}
+
+#sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:998;padding:.75rem 0;transition:transform .3s ease}
+#sidebar .nav-section{padding:.25rem 0}
+#sidebar .nav-heading{padding:.5rem 1.25rem;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:700}
+#sidebar .nav-item{display:flex;align-items:center;gap:.6rem;padding:.45rem 1.25rem;color:var(--text2);font-size:.85rem;cursor:pointer;transition:var(--transition);border-left:3px solid transparent}
+#sidebar .nav-item:hover{background:var(--accent-dim);color:var(--text)}
+#sidebar .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-dim)}
+#sidebar .nav-item .nav-icon{width:18px;text-align:center;font-size:.9rem;flex-shrink:0}
+#sidebar .nav-sub{padding-left:2.5rem}
+#sidebar .nav-sub .nav-item{font-size:.8rem;padding:.35rem 1rem;border-left:none}
+#sidebar .nav-collapse{max-height:0;overflow:hidden;transition:max-height .3s ease}
+#sidebar .nav-collapse.open{max-height:1000px}
+
+#main{margin-left:var(--sidebar-w);margin-top:calc(var(--header-h) + 36px);padding:2rem;min-height:calc(100vh - var(--header-h) - 36px)}
+.section{display:none;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:1.25rem;margin-bottom:1rem;transition:var(--transition)}
+.card:hover{border-color:var(--border2)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.card-header h3{font-size:1.1rem}
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;border-radius:99px;font-size:.75rem;font-weight:600}
+.badge-green{background:rgba(0,255,136,.15);color:var(--accent)}.badge-red{background:var(--red-dim);color:var(--red)}.badge-yellow{background:var(--yellow-dim);color:var(--yellow)}.badge-blue{background:rgba(77,171,247,.15);color:var(--blue)}
+
+/* Spec grid */
+.spec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem}
+.spec-item{background:var(--card2);border-radius:var(--radius);padding:.75rem;border-left:3px solid var(--accent)}
+.spec-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:.25rem}
+.spec-value{font-size:1rem;font-weight:600;color:#fff}
+.spec-unit{font-size:.8rem;color:var(--text2);font-weight:400}
+
+/* Accordion */
+.accordion{border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin-bottom:.75rem}
+.accordion-header{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;background:var(--card);cursor:pointer;transition:var(--transition);user-select:none}
+.accordion-header:hover{background:var(--card2)}
+.accordion-header .chevron{transition:transform .25s;color:var(--text3);flex-shrink:0}
+.accordion-header.open .chevron{transform:rotate(90deg)}
+.accordion-header h4{flex:1}
+.accordion-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.accordion-body.open{max-height:5000px}
+.accordion-content{padding:1.25rem;background:var(--bg2);border-top:1px solid var(--border)}
+
+/* Flowchart steps */
+.flow-step{position:relative;padding-left:3rem;margin-bottom:.5rem}
+.flow-step::before{content:'';position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--border2)}
+.flow-step:last-child::before{display:none}
+.flow-step .step-dot{position:absolute;left:8px;top:.75rem;width:16px;height:16px;border-radius:50%;border:2px solid var(--accent);background:var(--bg);z-index:1}
+.flow-step.hazard-green .step-dot{border-color:var(--accent);background:rgba(0,255,136,.2)}
+.flow-step.hazard-yellow .step-dot{border-color:var(--yellow);background:rgba(255,193,7,.2)}
+.flow-step.hazard-red .step-dot{border-color:var(--red);background:rgba(255,71,87,.2)}
+
+/* SVG Section */
+.svg-container{background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:1.5rem;overflow:hidden}
+.svg-container svg{width:100%;height:auto}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;margin-bottom:1rem;background:var(--card);border-radius:var(--radius);padding:3px;overflow-x:auto}
+.tab-btn{padding:.5rem 1rem;border-radius:6px;font-size:.85rem;font-weight:500;color:var(--text2);background:transparent;white-space:nowrap;transition:var(--transition)}
+.tab-btn:hover{color:var(--text);background:var(--card2)}
+.tab-btn.active{background:var(--accent);color:#000}
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* Comparison table */
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden}
+.comparison-grid .comp-header{background:var(--card2);padding:.75rem;font-weight:600;text-align:center;border-bottom:1px solid var(--border)}
+.comparison-grid .comp-cell{padding:.6rem .75rem;border-bottom:1px solid var(--border);font-size:.85rem;border-right:1px solid var(--border)}
+.comparison-grid .comp-cell:nth-child(3n){border-right:none}
+.comparison-grid .comp-cell.label{background:var(--card);color:var(--text2);font-weight:500}
+.comparison-grid .comp-cell.changed{background:rgba(0,255,136,.08);color:var(--accent)}
+
+/* Calculator */
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.calc-input-group{margin-bottom:.75rem}
+.calc-input-group label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:.3rem}
+.calc-input-group input{width:100%}
+.calc-result{background:var(--accent-dim);border:1px solid rgba(0,255,136,.2);border-radius:var(--radius2);padding:1.25rem;text-align:center}
+.calc-result .result-value{font-size:2rem;font-weight:800;color:var(--accent)}
+.calc-result .result-label{font-size:.8rem;color:var(--text2)}
+
+/* Gauge */
+.gauge-wrap{width:160px;height:90px;position:relative;margin:0 auto}
+.gauge-bg{fill:none;stroke:var(--border);stroke-width:14}
+.gauge-fill{fill:none;stroke:var(--accent);stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+
+/* PPE Matrix */
+.ppe-matrix{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem}
+.ppe-item{background:var(--card2);border-radius:var(--radius);padding:.6rem;text-align:center;font-size:.8rem}
+.ppe-item .ppe-icon{font-size:1.5rem;margin-bottom:.3rem}
+.ppe-item.required{border:1px solid var(--accent);background:var(--accent-dim)}
+.ppe-item.optional{border:1px solid var(--border2)}
+
+/* Search Results */
+#search-results{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border2);border-radius:0 0 var(--radius) var(--radius);max-height:350px;overflow-y:auto;display:none;z-index:1001}
+#search-results .sr-item{padding:.6rem .8rem;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--border);transition:background .15s}
+#search-results .sr-item:hover{background:var(--accent-dim)}
+#search-results .sr-item .sr-section{font-size:.7rem;color:var(--accent);text-transform:uppercase}
+
+/* Back to top */
+#btt{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#000;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;opacity:0;transform:translateY(10px);transition:var(--transition);z-index:1000;box-shadow:var(--shadow)}
+#btt.show{opacity:1;transform:translateY(0)}
+
+/* Print */
+@media print{
+  #sidebar,#header,#breadcrumb,#btt,.no-print{display:none!important}
+  #main{margin:0!important;padding:1rem!important}
+  .section{display:block!important;page-break-inside:avoid}
+  body{background:#fff;color:#000}
+  .card{border:1px solid #ccc;background:#fff}
+  th{background:#eee}
+}
+
+/* Responsive */
+@media(max-width:900px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}
+  #breadcrumb{left:0}
+  #header .menu-toggle{display:block}
+  .calc-grid{grid-template-columns:1fr}
+  .comparison-grid{grid-template-columns:1fr}
+  .spec-grid{grid-template-columns:1fr 1fr}
+}
+
+/* Component detail overlay */
+.component-detail{background:var(--card);border:1px solid var(--accent);border-radius:var(--radius2);padding:1.5rem;margin-top:1rem;animation:fadeIn .3s ease}
+.component-detail h3{color:var(--accent);margin-bottom:.75rem}
+.detail-row{display:flex;gap:1rem;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.detail-row .dl{color:var(--text3);min-width:160px;flex-shrink:0}
+.detail-row .dv{color:var(--text)}
+
+/* Flowchart styles */
+.process-flowchart{position:relative;padding:1rem 0}
+.flow-connector{height:24px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:.9rem}
+.flow-node{background:var(--card);border:2px solid var(--border2);border-radius:var(--radius2);padding:1rem 1.25rem;cursor:pointer;transition:var(--transition)}
+.flow-node:hover{border-color:var(--accent);background:var(--card2)}
+.flow-node.green{border-left:4px solid var(--accent)}
+.flow-node.yellow{border-left:4px solid var(--yellow)}
+.flow-node.red{border-left:4px solid var(--red)}
+.flow-node .fn-num{font-size:.7rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.flow-node .fn-title{font-weight:600;color:#fff;margin-top:.15rem}
+.flow-node .fn-meta{font-size:.8rem;color:var(--text3);margin-top:.25rem;display:flex;gap:1rem}
+
+/* Glossary */
+.glossary-grid{column-count:2;column-gap:1.5rem}
+.glossary-item{break-inside:avoid;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.88rem}
+.glossary-item .g-term{font-weight:600;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.82rem}
+
+/* Notification banner */
+.notice{padding:.75rem 1rem;border-radius:var(--radius);margin-bottom:1rem;font-size:.88rem;display:flex;align-items:flex-start;gap:.6rem;line-height:1.5}
+.notice-warn{background:var(--yellow-dim);border:1px solid rgba(255,193,7,.3);color:var(--yellow)}
+.notice-danger{background:var(--red-dim);border:1px solid rgba(255,71,87,.3);color:var(--red)}
+.notice-info{background:rgba(77,171,247,.1);border:1px solid rgba(77,171,247,.2);color:var(--blue)}
+
+/* Section header */
+.section-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.section-header h1{margin-bottom:.5rem}
+.section-header p{color:var(--text2);font-size:.95rem;max-width:700px}
+.section-header .classification{display:inline-block;background:var(--red);color:#fff;padding:.15rem .6rem;border-radius:3px;font-size:.7rem;font-weight:700;letter-spacing:1px;margin-bottom:.5rem}
+
+/* TOC inside sections */
+.section-toc{background:var(--card2);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.5rem}
+.section-toc h4{font-size:.85rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem}
+.section-toc a{display:block;padding:.25rem 0;color:var(--text2);font-size:.88rem}.section-toc a:hover{color:var(--accent)}
+
+/* Inline stat bar */
+.stat-bar{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem 1rem;flex:1;min-width:150px}
+.stat .s-val{font-size:1.4rem;font-weight:800;color:var(--accent)}
+.stat .s-label{font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+
+/* ncr flowchart */
+.ncr-flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:center;padding:1rem}
+.ncr-box{background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);padding:.6rem 1rem;font-size:.82rem;text-align:center;min-width:120px}
+.ncr-arrow{color:var(--accent);font-weight:700;font-size:1.2rem}
+</style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header id="header">
+  <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+  <div class="logo">
+    <div class="shield">GD</div>
+    <span>GCDL Defense</span>
+  </div>
+  <div class="doc-title">M433A1 HEDP — Production Operations Manual</div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search manual... (Ctrl+K)" autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+</header>
+
+<!-- ==================== BREADCRUMB ==================== -->
+<div id="breadcrumb">
+  <span>GCDL Defense</span><span class="sep">›</span>
+  <span>Ops Manual</span><span class="sep">›</span>
+  <span class="crumb-active" id="bc-current">Round Overview</span>
+</div>
+
+<!-- ==================== SIDEBAR ==================== -->
+<nav id="sidebar">
+  <div class="nav-section">
+    <div class="nav-heading">General</div>
+    <div class="nav-item active" data-section="overview" data-label="Round Overview">
+      <span class="nav-icon">🎯</span>Round Overview
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-heading">Components</div>
+    <div class="nav-item" data-section="comp-case" data-label="M118A1 Cartridge Case"><span class="nav-icon">🔩</span>M118A1 Case</div>
+    <div class="nav-item" data-section="comp-primer" data-label="M42A1 Primer"><span class="nav-icon">💥</span>M42A1 Primer</div>
+    <div class="nav-item" data-section="comp-propellant" data-label="M2 Propellant"><span class="nav-icon">⚗️</span>M2 Propellant</div>
+    <div class="nav-item" data-section="comp-liner" data-label="Shaped Charge Liner"><span class="nav-icon">🔶</span>Shaped Charge Liner</div>
+    <div class="nav-item" data-section="comp-explosive" data-label="Comp A5 Explosive"><span class="nav-icon">💣</span>Comp A5 Fill</div>
+    <div class="nav-item" data-section="comp-fragbody" data-label="Frag Body"><span class="nav-icon">🛡️</span>Frag Body</div>
+    <div class="nav-item" data-section="comp-tungsten" data-label="Tungsten Matrix"><span class="nav-icon">⚫</span>Tungsten Matrix</div>
+    <div class="nav-item" data-section="comp-ogive" data-label="Plastic Ogive"><span class="nav-icon">🔷</span>Plastic Ogive</div>
+    <div class="nav-item" data-section="comp-fuze" data-label="M550A1 Fuze"><span class="nav-icon">⏱️</span>M550A1 Fuze</div>
+    <div class="nav-item" data-section="comp-band" data-label="Rotating Band"><span class="nav-icon">🔴</span>Rotating Band</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-heading">Operations</div>
+    <div class="nav-item" data-section="assembly" data-label="Assembly Process"><span class="nav-icon">🏭</span>Assembly Process</div>
+    <div class="nav-item" data-section="quality" data-label="Quality Control"><span class="nav-icon">✅</span>Quality Control</div>
+    <div class="nav-item" data-section="regulatory" data-label="Regulatory & Compliance"><span class="nav-icon">📋</span>Regulatory</div>
+    <div class="nav-item" data-section="safety" data-label="Safety Manual"><span class="nav-icon">⚠️</span>Safety Manual</div>
+    <div class="nav-item" data-section="supply" data-label="Supply Chain"><span class="nav-icon">🚚</span>Supply Chain</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-heading">Tools</div>
+    <div class="nav-item" data-section="calculators" data-label="Calculators"><span class="nav-icon">🧮</span>Calculators</div>
+    <div class="nav-item" data-section="glossary" data-label="Glossary & Reference"><span class="nav-icon">📖</span>Glossary</div>
+  </div>
+  <div style="padding:1.25rem;margin-top:1rem;border-top:1px solid var(--border)">
+    <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem">Document Control</div>
+    <div style="font-size:.8rem;color:var(--text2)">Rev. 3.2 — March 2026</div>
+    <div style="font-size:.75rem;color:var(--text3);margin-top:.15rem">DISTRIBUTION: CONTROLLED</div>
+    <div style="font-size:.75rem;color:var(--text3)">ITAR RESTRICTED</div>
+  </div>
+</nav>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main id="main">
+
+<!-- =====================================================
+     SECTION 1: ROUND OVERVIEW
+     ===================================================== -->
+<div class="section active" id="sec-overview">
+  <div class="section-header">
+    <div class="classification">CONTROLLED — ITAR RESTRICTED</div>
+    <h1>40mm M433A1 HEDP Round — Technical Overview</h1>
+    <p>High Explosive Dual Purpose cartridge for the M203, M320, and Mk19 Mod 3 grenade launchers. Designed to defeat light armor and personnel targets with a combined shaped charge and fragmentation effect.</p>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="stat-bar">
+    <div class="stat"><div class="s-val">40×46mm</div><div class="s-label">Cartridge</div></div>
+    <div class="stat"><div class="s-val">340g</div><div class="s-label">Complete Weight</div></div>
+    <div class="stat"><div class="s-val">76 m/s</div><div class="s-label">Muzzle Velocity</div></div>
+    <div class="stat"><div class="s-val">400m</div><div class="s-label">Max Effective Range</div></div>
+    <div class="stat"><div class="s-val">63mm</div><div class="s-label">Armor Penetration (RHA)</div></div>
+    <div class="stat"><div class="s-val">1.4S</div><div class="s-label">DOT Class</div></div>
+  </div>
+
+  <!-- SVG Cross Section -->
+  <h2 style="margin-bottom:1rem">Interactive Cross-Section</h2>
+  <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem">Click any component to view detailed specifications. Hover for identification.</p>
+  <div class="svg-container" style="position:relative">
+    <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" id="roundSVG">
+      <defs>
+        <linearGradient id="metalGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8899aa"/><stop offset="50%" stop-color="#667788"/><stop offset="100%" stop-color="#556677"/></linearGradient>
+        <linearGradient id="copperGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4875e"/><stop offset="50%" stop-color="#b8734a"/><stop offset="100%" stop-color="#a06030"/></linearGradient>
+        <linearGradient id="brassGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c9a84c"/><stop offset="50%" stop-color="#b8943a"/><stop offset="100%" stop-color="#a07d2e"/></linearGradient>
+        <linearGradient id="aluminumGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b8c5d0"/><stop offset="50%" stop-color="#98a8b8"/><stop offset="100%" stop-color="#889aaa"/></linearGradient>
+        <linearGradient id="steelGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#607060"/><stop offset="50%" stop-color="#4a5a4a"/><stop offset="100%" stop-color="#384838"/></linearGradient>
+        <linearGradient id="explosiveGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4a44c"/><stop offset="50%" stop-color="#c89838"/><stop offset="100%" stop-color="#b08028"/></linearGradient>
+        <linearGradient id="tungstenGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#555"/><stop offset="100%" stop-color="#333"/></linearGradient>
+        <linearGradient id="ogiveGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5a7a5a"/><stop offset="50%" stop-color="#4a6a4a"/><stop offset="100%" stop-color="#3a5a3a"/></linearGradient>
+      </defs>
+
+      <!-- Background grid -->
+      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,.03)" stroke-width="0.5"/>
+      </pattern>
+      <rect width="900" height="280" fill="url(#grid)"/>
+
+      <!-- CARTRIDGE CASE (M118A1) -->
+      <g class="svg-component" data-comp="case" style="cursor:pointer">
+        <rect x="100" y="90" width="200" height="100" rx="3" fill="url(#aluminumGrad)" stroke="#6a7a8a" stroke-width="1.5"/>
+        <rect x="95" y="170" width="210" height="20" rx="2" fill="url(#aluminumGrad)" stroke="#6a7a8a" stroke-width="1"/>
+        <!-- case rim -->
+        <rect x="90" y="185" width="220" height="8" rx="2" fill="#7a8a9a" stroke="#6a7a8a" stroke-width="1"/>
+        <text x="200" y="150" text-anchor="middle" font-size="11" fill="#2a3a4a" font-weight="700" font-family="Inter">M118A1 CASE</text>
+        <text x="200" y="163" text-anchor="middle" font-size="8" fill="#4a5a6a" font-family="Inter">AL 6061-T6</text>
+      </g>
+
+      <!-- PRIMER (M42A1) -->
+      <g class="svg-component" data-comp="primer" style="cursor:pointer">
+        <circle cx="200" cy="193" r="10" fill="url(#brassGrad)" stroke="#8a7a3a" stroke-width="1.5"/>
+        <circle cx="200" cy="193" r="4" fill="#706020"/>
+        <text x="200" y="215" text-anchor="middle" font-size="8" fill="var(--text3)" font-family="Inter">M42A1 PRIMER</text>
+      </g>
+
+      <!-- PROPELLANT -->
+      <g class="svg-component" data-comp="propellant" style="cursor:pointer">
+        <rect x="115" y="95" width="170" height="30" rx="2" fill="#3a4a3a" opacity=".7" stroke="#5a6a5a" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="200" y="114" text-anchor="middle" font-size="9" fill="#8a9a7a" font-weight="600" font-family="Inter">M2 PROPELLANT (4.2g)</text>
+      </g>
+
+      <!-- PROJECTILE BODY (Steel Frag) -->
+      <g class="svg-component" data-comp="fragbody" style="cursor:pointer">
+        <path d="M300,95 L300,185 L480,185 L480,95 L460,70 L320,70 Z" fill="url(#steelGrad)" stroke="#5a6a5a" stroke-width="1.5"/>
+        <!-- Notch pattern -->
+        <line x1="320" y1="80" x2="320" y2="180" stroke="#2a3a2a" stroke-width=".5" stroke-dasharray="4,4"/>
+        <line x1="340" y1="75" x2="340" y2="182" stroke="#2a3a2a" stroke-width=".5" stroke-dasharray="4,4"/>
+        <line x1="360" y1="73" x2="360" y2="183" stroke="#2a3a2a" stroke-width=".5" stroke-dasharray="4,4"/>
+        <line x1="380" y1="72" x2="380" y2="184" stroke="#2a3a2a" stroke-width=".5" stroke-dasharray="4,4"/>
+        <line x1="400" y1="72" x2="400" y2="184" stroke="#2a3a2a" stroke-width=".5" stroke-dasharray="4,4"/>
+        <line x1="420" y1="72" x2="420" y2="184" stroke="#2a3a2a" stroke-width=".5" stroke-dasharray="4,4"/>
+        <line x1="440" y1="73" x2="440" y2="183" stroke="#2a3a2a" stroke-width=".5" stroke-dasharray="4,4"/>
+        <line x1="460" y1="75" x2="460" y2="182" stroke="#2a3a2a" stroke-width=".5" stroke-dasharray="4,4"/>
+        <text x="390" y="110" text-anchor="middle" font-size="10" fill="#9aaa8a" font-weight="600" font-family="Inter">STEEL FRAG BODY</text>
+        <text x="390" y="123" text-anchor="middle" font-size="8" fill="#7a8a6a" font-family="Inter">AISI 1045 — Scored</text>
+      </g>
+
+      <!-- EXPLOSIVE FILL (Comp A5) -->
+      <g class="svg-component" data-comp="explosive" style="cursor:pointer">
+        <rect x="315" y="128" width="150" height="50" rx="2" fill="url(#explosiveGrad)" stroke="#a08020" stroke-width="1"/>
+        <text x="390" y="150" text-anchor="middle" font-size="10" fill="#3a2a0a" font-weight="700" font-family="Inter">COMP A5</text>
+        <text x="390" y="163" text-anchor="middle" font-size="8" fill="#5a4a1a" font-family="Inter">RDX 98.5% — 39g</text>
+      </g>
+
+      <!-- SHAPED CHARGE LINER (Copper) -->
+      <g class="svg-component" data-comp="liner" style="cursor:pointer">
+        <path d="M340,128 L390,160 L440,128" fill="none" stroke="url(#copperGrad)" stroke-width="3"/>
+        <path d="M338,126 L390,162 L442,126" fill="none" stroke="#d4975e" stroke-width="1.5" stroke-dasharray="0"/>
+        <text x="390" y="176" text-anchor="middle" font-size="7" fill="#c48040" font-weight="600" font-family="Inter">Cu LINER (OFHC)</text>
+      </g>
+
+      <!-- ROTATING BAND -->
+      <g class="svg-component" data-comp="band" style="cursor:pointer">
+        <rect x="290" y="178" width="20" height="12" rx="2" fill="url(#copperGrad)" stroke="#b07040" stroke-width="1"/>
+        <text x="300" y="205" text-anchor="middle" font-size="7" fill="#c08050" font-family="Inter">Cu BAND</text>
+      </g>
+
+      <!-- TUNGSTEN MATRIX / OGIVE -->
+      <g class="svg-component" data-comp="tungsten" style="cursor:pointer">
+        <path d="M480,95 L480,185 L560,185 L560,130 L530,80 L480,70 Z" fill="url(#ogiveGrad)" stroke="#4a6a4a" stroke-width="1.5"/>
+        <!-- tungsten spheres -->
+        <circle cx="500" cy="100" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="515" cy="95" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="508" cy="110" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="525" cy="105" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="495" cy="120" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="510" cy="125" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="530" cy="120" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="500" cy="140" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="520" cy="138" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="540" cy="135" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="505" cy="155" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="525" cy="155" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="545" cy="150" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="500" cy="170" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="520" cy="170" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <circle cx="540" cy="168" r="3" fill="#555" stroke="#777" stroke-width=".5"/>
+        <text x="520" y="190" text-anchor="middle" font-size="8" fill="#8a9a7a" font-family="Inter">W MATRIX</text>
+      </g>
+
+      <!-- OGIVE (front) -->
+      <g class="svg-component" data-comp="ogive" style="cursor:pointer">
+        <path d="M560,130 L560,185 L640,185 L640,170 L620,120 L580,100 L560,95 Z" fill="url(#ogiveGrad)" stroke="#4a6a4a" stroke-width="1.5"/>
+        <text x="600" y="160" text-anchor="middle" font-size="9" fill="#aabb99" font-weight="600" font-family="Inter">OGIVE</text>
+      </g>
+
+      <!-- FUZE (M550A1) -->
+      <g class="svg-component" data-comp="fuze" style="cursor:pointer">
+        <path d="M640,140 L640,190 L700,190 L700,165 L680,130 L650,125 Z" fill="url(#metalGrad)" stroke="#7a8a9a" stroke-width="1.5"/>
+        <rect x="695" y="150" width="30" height="30" rx="2" fill="#7a8a9a" stroke="#6a7a8a" stroke-width="1"/>
+        <circle cx="730" cy="165" r="5" fill="#4a5a6a" stroke="#6a7a8a" stroke-width="1"/>
+        <text x="690" y="210" text-anchor="middle" font-size="9" fill="var(--text2)" font-weight="600" font-family="Inter">M550A1 PD FUZE</text>
+      </g>
+
+      <!-- LEADER LINES -->
+      <line x1="200" y1="88" x2="200" y2="55" stroke="var(--accent)" stroke-width=".5" opacity=".5"/>
+      <text x="200" y="50" text-anchor="middle" font-size="8" fill="var(--accent)" font-family="Inter" opacity=".7">CARTRIDGE CASE</text>
+
+      <line x1="390" y1="68" x2="390" y2="40" stroke="var(--accent)" stroke-width=".5" opacity=".5"/>
+      <text x="390" y="35" text-anchor="middle" font-size="8" fill="var(--accent)" font-family="Inter" opacity=".7">PROJECTILE BODY</text>
+
+      <line x1="690" y1="125" x2="690" y2="30" stroke="var(--accent)" stroke-width=".5" opacity=".5"/>
+      <text x="690" y="25" text-anchor="middle" font-size="8" fill="var(--accent)" font-family="Inter" opacity=".7">POINT DETONATING FUZE</text>
+
+      <!-- DIMENSION LINES -->
+      <line x1="90" y1="230" x2="730" y2="230" stroke="var(--text3)" stroke-width=".5"/>
+      <line x1="90" y1="225" x2="90" y2="235" stroke="var(--text3)" stroke-width=".5"/>
+      <line x1="730" y1="225" x2="730" y2="235" stroke="var(--text3)" stroke-width=".5"/>
+      <text x="410" y="245" text-anchor="middle" font-size="9" fill="var(--text3)" font-family="Inter">Overall Length: 112mm (4.41")</text>
+
+      <line x1="90" y1="255" x2="310" y2="255" stroke="var(--text3)" stroke-width=".5" stroke-dasharray="3,2"/>
+      <text x="200" y="268" text-anchor="middle" font-size="8" fill="var(--text3)" font-family="Inter">Case: 46mm</text>
+
+      <line x1="300" y1="255" x2="730" y2="255" stroke="var(--text3)" stroke-width=".5" stroke-dasharray="3,2"/>
+      <text x="515" y="268" text-anchor="middle" font-size="8" fill="var(--text3)" font-family="Inter">Projectile: 66mm</text>
+    </svg>
+    <div id="svgDetail" style="display:none"></div>
+  </div>
+
+  <!-- Spec Card -->
+  <div style="margin-top:2rem">
+    <h2 style="margin-bottom:1rem">Performance Specifications</h2>
+    <div class="spec-grid">
+      <div class="spec-item"><div class="spec-label">Caliber</div><div class="spec-value">40×46mm <span class="spec-unit">Low Velocity</span></div></div>
+      <div class="spec-item"><div class="spec-label">Cartridge Type</div><div class="spec-value">HEDP <span class="spec-unit">M433A1</span></div></div>
+      <div class="spec-item"><div class="spec-label">Projectile Weight</div><div class="spec-value">230g <span class="spec-unit">(8.11 oz)</span></div></div>
+      <div class="spec-item"><div class="spec-label">Complete Round</div><div class="spec-value">340g <span class="spec-unit">(12.0 oz)</span></div></div>
+      <div class="spec-item"><div class="spec-label">Muzzle Velocity</div><div class="spec-value">76 m/s <span class="spec-unit">(250 ft/s)</span></div></div>
+      <div class="spec-item"><div class="spec-label">Max Pressure</div><div class="spec-value">3,000 <span class="spec-unit">PSI (20.7 MPa)</span></div></div>
+      <div class="spec-item"><div class="spec-label">Effective Range</div><div class="spec-value">400m <span class="spec-unit">(437 yd)</span></div></div>
+      <div class="spec-item"><div class="spec-label">Max Range</div><div class="spec-value">400m <span class="spec-unit">(area targets)</span></div></div>
+      <div class="spec-item"><div class="spec-label">Armor Penetration</div><div class="spec-value">63mm <span class="spec-unit">RHA (2.5")</span></div></div>
+      <div class="spec-item"><div class="spec-label">Lethal Radius</div><div class="spec-value">5m <span class="spec-unit">fragmentation</span></div></div>
+      <div class="spec-item"><div class="spec-label">Casualty Radius</div><div class="spec-value">15m <span class="spec-unit">fragmentation</span></div></div>
+      <div class="spec-item"><div class="spec-label">Fuze</div><div class="spec-value">M550A1 <span class="spec-unit">PD (SQ + Graze)</span></div></div>
+      <div class="spec-item"><div class="spec-label">Arming Distance</div><div class="spec-value">14–28m <span class="spec-unit">from muzzle</span></div></div>
+      <div class="spec-item"><div class="spec-label">Propellant</div><div class="spec-value">M2 <span class="spec-unit">4.2g charge</span></div></div>
+      <div class="spec-item"><div class="spec-label">Operating Temp</div><div class="spec-value">−51 to +63°C <span class="spec-unit">(−60 to +145°F)</span></div></div>
+      <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-value">Class 1.4S <span class="spec-unit">DOT / UN0012</span></div></div>
+      <div class="spec-item"><div class="spec-label">Shelf Life</div><div class="spec-value">20+ years <span class="spec-unit">conditioned storage</span></div></div>
+      <div class="spec-item"><div class="spec-label">Packaging</div><div class="spec-value">48 rds <span class="spec-unit">per M2A1 can</span></div></div>
+    </div>
+  </div>
+
+  <!-- M433 vs M433A1 Comparison -->
+  <div style="margin-top:2rem">
+    <h2 style="margin-bottom:1rem">M433 vs M433A1 — What Changed</h2>
+    <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem">The M433A1 is an Engineering Change Proposal (ECP) upgrade addressing reliability and lethality improvements identified during OEF/OIF.</p>
+    <div class="comparison-grid">
+      <div class="comp-header">Parameter</div><div class="comp-header">M433 (Original)</div><div class="comp-header" style="color:var(--accent)">M433A1 (Current)</div>
+
+      <div class="comp-cell label">Fuze</div><div class="comp-cell">M549 PD</div><div class="comp-cell changed">M550A1 PD — Improved graze sensitivity</div>
+      <div class="comp-cell label">Fragment Material</div><div class="comp-cell">Steel pre-formed fragments</div><div class="comp-cell changed">Tungsten spheres in plastic matrix</div>
+      <div class="comp-cell label">Fragmentation Pattern</div><div class="comp-cell">Asymmetric, inconsistent</div><div class="comp-cell changed">Controlled 360° uniform pattern</div>
+      <div class="comp-cell label">Casualty Radius</div><div class="comp-cell">~10m</div><div class="comp-cell changed">15m — 50% improvement</div>
+      <div class="comp-cell label">Armor Penetration</div><div class="comp-cell">2" (50mm) RHA</div><div class="comp-cell changed">2.5" (63mm) RHA</div>
+      <div class="comp-cell label">Fuze Reliability</div><div class="comp-cell">97.5% function rate</div><div class="comp-cell changed">99.2% function rate</div>
+      <div class="comp-cell label">Graze Function</div><div class="comp-cell">Limited — high dud rate at oblique</div><div class="comp-cell changed">Enhanced — functions to 70° obliquity</div>
+      <div class="comp-cell label">Operating Temp</div><div class="comp-cell">−40 to +52°C</div><div class="comp-cell changed">−51 to +63°C — Extended range</div>
+      <div class="comp-cell label">Propellant</div><div class="comp-cell">M2 (4.2g)</div><div class="comp-cell">M2 (4.2g) — No change</div>
+      <div class="comp-cell label">Cartridge Case</div><div class="comp-cell">M118A1 (Al 6061-T6)</div><div class="comp-cell">M118A1 — No change</div>
+      <div class="comp-cell label">Primer</div><div class="comp-cell">M42A1</div><div class="comp-cell">M42A1 — No change</div>
+      <div class="comp-cell label">Weight (Complete)</div><div class="comp-cell">335g</div><div class="comp-cell">340g — Marginal increase</div>
+    </div>
+  </div>
+
+  <!-- Weapon Compatibility -->
+  <div style="margin-top:2rem">
+    <h2 style="margin-bottom:1rem">Weapon Platform Compatibility</h2>
+    <div class="spec-grid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">
+      <div class="card" style="margin:0"><h4>M203 Under-barrel</h4><p style="color:var(--text2);font-size:.85rem;margin-top:.3rem">Single-shot, breach-loaded. Mounted under M16/M4. Primary platform for LV 40mm.</p></div>
+      <div class="card" style="margin:0"><h4>M320 (GLM)</h4><p style="color:var(--text2);font-size:.85rem;margin-top:.3rem">Side-loading, day/night sights. Standalone or under-barrel. Replacing M203.</p></div>
+      <div class="card" style="margin:0"><h4>M79 "Thumper"</h4><p style="color:var(--text2);font-size:.85rem;margin-top:.3rem">Legacy break-action single-shot. Still in limited service with SOF and allied forces.</p></div>
+      <div class="card" style="margin:0"><h4>Milkor M32A1 MGL</h4><p style="color:var(--text2);font-size:.85rem;margin-top:.3rem">6-round revolver launcher. USMC adoption as M32A1. Rapid engagement capability.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     COMPONENT DEEP-DIVES
+     ===================================================== -->
+
+<!-- M118A1 CARTRIDGE CASE -->
+<div class="section" id="sec-comp-case">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>M118A1 Cartridge Case</h1>
+    <p>Aluminum alloy cartridge case, deep drawn and anodized. Primary structural container for propellant, primer, and provides the obturation seal during firing.</p>
+  </div>
+  <div class="notice notice-info">ℹ️ The M118A1 case is unique in ammunition — most cartridge cases are brass. The aluminum construction reduces weight 40% while maintaining the low-pressure requirements of the 40×46mm system (≤3,000 PSI vs 55,000 PSI for 5.56mm).</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Material</div><div class="spec-value">6061-T6 <span class="spec-unit">Aluminum</span></div></div>
+    <div class="spec-item"><div class="spec-label">Manufacturing</div><div class="spec-value">Deep Drawn <span class="spec-unit">+ Anodized</span></div></div>
+    <div class="spec-item"><div class="spec-label">Case Length</div><div class="spec-value">46.0mm <span class="spec-unit">±0.13mm</span></div></div>
+    <div class="spec-item"><div class="spec-label">Case Diameter</div><div class="spec-value">40.0mm <span class="spec-unit">at mouth</span></div></div>
+    <div class="spec-item"><div class="spec-label">Rim Diameter</div><div class="spec-value">48.3mm <span class="spec-unit">±0.10mm</span></div></div>
+    <div class="spec-item"><div class="spec-label">Wall Thickness</div><div class="spec-value">0.76mm <span class="spec-unit">min</span></div></div>
+    <div class="spec-item"><div class="spec-label">Case Weight</div><div class="spec-value">68g <span class="spec-unit">±2g</span></div></div>
+    <div class="spec-item"><div class="spec-label">MIL-SPEC</div><div class="spec-value">MIL-DTL-45588</div></div>
+    <div class="spec-item"><div class="spec-label">Proof Pressure</div><div class="spec-value">4,500 PSI <span class="spec-unit">(150% MAP)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Surface Finish</div><div class="spec-value">Type III <span class="spec-unit">Hard Anodize</span></div></div>
+    <div class="spec-item"><div class="spec-label">Anodize Thickness</div><div class="spec-value">0.025mm <span class="spec-unit">min</span></div></div>
+    <div class="spec-item"><div class="spec-label">Headstamp</div><div class="spec-value">Mfr + Lot <span class="spec-unit">+ Year</span></div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Manufacturing Process</h3>
+  <div class="card">
+    <ol style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+      <li><strong style="color:var(--text)">Blank Preparation:</strong> 6061-T6 sheet stock is blanked into circular discs (slug weight controlled ±0.5g)</li>
+      <li><strong style="color:var(--text)">Cupping:</strong> Initial draw to form shallow cup (reduction ratio ~40%)</li>
+      <li><strong style="color:var(--text)">Successive Draws:</strong> 3-4 progressive draws with intermediate anneals at 415°C to achieve final case length</li>
+      <li><strong style="color:var(--text)">Head Forming:</strong> Primer pocket, flash hole, and headstamp formed by cold heading operation</li>
+      <li><strong style="color:var(--text)">Mouth Trimming:</strong> Case mouth trimmed to length (46.0mm ±0.13mm), deburred</li>
+      <li><strong style="color:var(--text)">T6 Heat Treatment:</strong> Solution heat treat at 530°C, water quench, age at 175°C/8hrs to restore T6 temper</li>
+      <li><strong style="color:var(--text)">Type III Anodize:</strong> Hard anodize per MIL-A-8625 for corrosion protection and surface hardness</li>
+      <li><strong style="color:var(--text)">Final Inspection:</strong> 100% go/no-go gauge for all critical dimensions, visual inspection for defects</li>
+    </ol>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Inspection Criteria</h3>
+  <table>
+    <thead><tr><th>Dimension</th><th>Specification</th><th>Tolerance</th><th>Gauge Type</th><th>Frequency</th></tr></thead>
+    <tbody>
+      <tr><td>Case Length</td><td>46.0mm</td><td>±0.13mm</td><td>Go/No-Go plug</td><td>100%</td></tr>
+      <tr><td>Mouth OD</td><td>40.0mm</td><td>±0.08mm</td><td>Ring gauge</td><td>100%</td></tr>
+      <tr><td>Rim Diameter</td><td>48.3mm</td><td>±0.10mm</td><td>Ring gauge</td><td>100%</td></tr>
+      <tr><td>Primer Pocket Depth</td><td>3.81mm</td><td>±0.05mm</td><td>Depth gauge</td><td>100%</td></tr>
+      <tr><td>Flash Hole Diameter</td><td>2.03mm</td><td>±0.05mm</td><td>Pin gauge</td><td>SPC sampling</td></tr>
+      <tr><td>Wall Thickness (min)</td><td>0.76mm</td><td>min</td><td>Ultrasonic</td><td>SPC sampling</td></tr>
+      <tr><td>Anodize Thickness</td><td>0.025mm</td><td>min</td><td>Eddy current</td><td>SPC sampling</td></tr>
+      <tr><td>Concentricity</td><td>—</td><td>TIR ≤0.05mm</td><td>V-block + indicator</td><td>SPC sampling</td></tr>
+    </tbody>
+  </table>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Supplier Qualification</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7">Case suppliers must maintain ISO 9001 + AS9100 certification. Initial qualification requires First Article Inspection (FAI) per AS9102 with all dimensions verified on a CMM. Ongoing qualification requires SPC data submission with each lot, annual audit, and maintenance of Cpk ≥1.67 on all critical dimensions. All aluminum stock must be domestic-source per DFARS 252.225-7009 (specialty metals clause).</p>
+  </div>
+</div>
+
+<!-- M42A1 PRIMER -->
+<div class="section" id="sec-comp-primer">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>M42A1 Percussion Primer</h1>
+    <p>Stab-initiated percussion primer used in all 40×46mm low-velocity cartridges. Provides the initial ignition impulse to the M2 propellant charge.</p>
+  </div>
+  <div class="notice notice-danger">⚠️ EXPLOSIVE COMPONENT — Handle per DoD 4145.26-M (Contractors' Safety Manual for Ammunition and Explosives). Primers are classified as 1.4S for shipping but contain primary explosive and are extremely sensitive to impact, friction, and electrostatic discharge.</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Type</div><div class="spec-value">Percussion <span class="spec-unit">Stab-Initiated</span></div></div>
+    <div class="spec-item"><div class="spec-label">Sensitivity</div><div class="spec-value">Stab Energy <span class="spec-unit">0.7–2.0 in-oz</span></div></div>
+    <div class="spec-item"><div class="spec-label">Primer Mix</div><div class="spec-value">NOL-130 <span class="spec-unit">(Lead Styphnate based)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Output</div><div class="spec-value">Hot Gas + Flame <span class="spec-unit">~3ms duration</span></div></div>
+    <div class="spec-item"><div class="spec-label">Cup Material</div><div class="spec-value">Gilding Metal <span class="spec-unit">(90Cu/10Zn)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Seal</div><div class="spec-value">Lacquer <span class="spec-unit">Waterproof</span></div></div>
+    <div class="spec-item"><div class="spec-label">Seat Depth</div><div class="spec-value">3.81mm <span class="spec-unit">±0.05mm below case head</span></div></div>
+    <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-value">Class 1.4S <span class="spec-unit">Compatibility Group S</span></div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Safety Testing Requirements</h3>
+  <table>
+    <thead><tr><th>Test</th><th>Method</th><th>Requirement</th><th>Sample Size</th></tr></thead>
+    <tbody>
+      <tr><td>Drop Test (No-Fire)</td><td>2-oz ball, 2" height</td><td>0/20 fires</td><td>20 per lot</td></tr>
+      <tr><td>Drop Test (All-Fire)</td><td>2-oz ball, 12" height</td><td>20/20 fires</td><td>20 per lot</td></tr>
+      <tr><td>5-Second Delay</td><td>Function at extreme cold</td><td>All fire within 5s</td><td>10 per lot</td></tr>
+      <tr><td>Stability (75°C/48hr)</td><td>Vacuum stability test</td><td>&lt;2.0 mL gas/g</td><td>Per MIL-STD-286</td></tr>
+      <tr><td>Waterproof</td><td>24hr immersion, 1m depth</td><td>100% function</td><td>10 per lot</td></tr>
+      <tr><td>ESD Sensitivity</td><td>Per MIL-STD-1751</td><td>No fire at 500V</td><td>20 per lot</td></tr>
+    </tbody>
+  </table>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Storage Requirements</h3>
+  <div class="card">
+    <ul style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+      <li>Store in original manufacturer packaging until use</li>
+      <li>Temperature: 10–32°C (50–90°F) preferred; −51 to +63°C survivable</li>
+      <li>Humidity: ≤70% RH; desiccant required in sealed containers</li>
+      <li>Segregate from bulk explosives per quantity-distance tables</li>
+      <li>FIFO rotation — maximum 10-year shelf life in uncontrolled storage</li>
+      <li>Ground all handling equipment to prevent ESD</li>
+      <li>No smoking, open flame, or spark-producing equipment within 50ft</li>
+    </ul>
+  </div>
+</div>
+
+<!-- M2 PROPELLANT -->
+<div class="section" id="sec-comp-propellant">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>M2 Propellant Charge</h1>
+    <p>Single-base nitrocellulose propellant in flake form. Provides the low-velocity gas generation (~3,000 PSI) that drives the M433A1 projectile to 76 m/s through the high-low pressure system.</p>
+  </div>
+  <div class="notice notice-warn">⚡ The 40×46mm "high-low" pressure system is critical to understand: propellant burns in the high-pressure chamber (cartridge case, ~3,000 PSI), then gas vents through the case vent holes into the low-pressure barrel chamber (~700 PSI), gently pushing the projectile. This keeps recoil manageable for shoulder-fired launchers.</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Composition</div><div class="spec-value">Single-Base <span class="spec-unit">Nitrocellulose</span></div></div>
+    <div class="spec-item"><div class="spec-label">NC Content</div><div class="spec-value">13.15% N <span class="spec-unit">±0.15%</span></div></div>
+    <div class="spec-item"><div class="spec-label">Grain Type</div><div class="spec-value">Flake <span class="spec-unit">(web ~0.3mm)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Charge Weight</div><div class="spec-value">4.2g <span class="spec-unit">±0.05g</span></div></div>
+    <div class="spec-item"><div class="spec-label">Deterrent</div><div class="spec-value">Dibutyl Phthalate <span class="spec-unit">~10%</span></div></div>
+    <div class="spec-item"><div class="spec-label">Stabilizer</div><div class="spec-value">Diphenylamine <span class="spec-unit">~1%</span></div></div>
+    <div class="spec-item"><div class="spec-label">Moisture</div><div class="spec-value">≤0.6% <span class="spec-unit">as loaded</span></div></div>
+    <div class="spec-item"><div class="spec-label">Bulk Density</div><div class="spec-value">0.55 g/cm³ <span class="spec-unit">nominal</span></div></div>
+    <div class="spec-item"><div class="spec-label">Flame Temp</div><div class="spec-value">~2,500 K</div></div>
+    <div class="spec-item"><div class="spec-label">Storage Class</div><div class="spec-value">1.3C <span class="spec-unit">(bulk)</span></div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Lot Acceptance Testing</h3>
+  <table>
+    <thead><tr><th>Test</th><th>Specification</th><th>Method</th><th>Frequency</th></tr></thead>
+    <tbody>
+      <tr><td>Charge Weight</td><td>4.2g ±0.05g</td><td>Analytical balance (0.001g)</td><td>Every 50th round</td></tr>
+      <tr><td>Muzzle Velocity</td><td>76 m/s ±3 m/s</td><td>Doppler radar / screens</td><td>10 rds per lot</td></tr>
+      <tr><td>Chamber Pressure</td><td>≤3,000 PSI</td><td>Copper crusher / piezo</td><td>10 rds per lot</td></tr>
+      <tr><td>Stability (134.5°C)</td><td>≥300 min to ignition</td><td>Taliani test</td><td>Per lot</td></tr>
+      <tr><td>Moisture Content</td><td>≤0.6%</td><td>Karl Fischer titration</td><td>Per lot</td></tr>
+      <tr><td>Granulation</td><td>Per web spec</td><td>Sieve analysis</td><td>Per lot</td></tr>
+    </tbody>
+  </table>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Temperature Sensitivity</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7">Propellant burn rate increases with temperature, directly affecting muzzle velocity and chamber pressure. The M2 charge is designed to remain within safe limits across the full operating range (−51°C to +63°C). At −51°C, expect velocity ~68 m/s (−10%); at +63°C, velocity ~82 m/s (+8%). All lot acceptance velocity testing is performed at 21°C ±3°C standard conditions. Temperature conditioning per MIL-STD-331 is required before proof testing at temperature extremes.</p>
+  </div>
+</div>
+
+<!-- COPPER SHAPED CHARGE LINER -->
+<div class="section" id="sec-comp-liner">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>Copper Shaped Charge Liner</h1>
+    <p>Precision-formed OFHC copper liner that forms the shaped charge jet upon detonation. The jet achieves hyper-velocity (~6 km/s tip speed) to penetrate 63mm of rolled homogeneous armor (RHA).</p>
+  </div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Material</div><div class="spec-value">OFHC Copper <span class="spec-unit">C10200 (99.95%)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Manufacturing</div><div class="spec-value">Cold Forming <span class="spec-unit">Precision Press</span></div></div>
+    <div class="spec-item"><div class="spec-label">Cone Angle</div><div class="spec-value">42° <span class="spec-unit">included angle</span></div></div>
+    <div class="spec-item"><div class="spec-label">Wall Thickness</div><div class="spec-value">1.5mm <span class="spec-unit">±0.05mm uniform</span></div></div>
+    <div class="spec-item"><div class="spec-label">Weight</div><div class="spec-value">18g <span class="spec-unit">±0.5g</span></div></div>
+    <div class="spec-item"><div class="spec-label">Surface Finish</div><div class="spec-value">0.8 µm Ra <span class="spec-unit">max (inner face)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Concentricity</div><div class="spec-value">TIR ≤0.03mm</div></div>
+    <div class="spec-item"><div class="spec-label">Grain Structure</div><div class="spec-value">Fine Equiaxed <span class="spec-unit">(ASTM 8–10)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Standoff</div><div class="spec-value">~40mm <span class="spec-unit">(~1 CD)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Jet Tip Velocity</div><div class="spec-value">~6 km/s</div></div>
+    <div class="spec-item"><div class="spec-label">Penetration</div><div class="spec-value">63mm RHA <span class="spec-unit">(2.5")</span></div></div>
+    <div class="spec-item"><div class="spec-label">Hardness</div><div class="spec-value">HV 50–80 <span class="spec-unit">(annealed)</span></div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Shaped Charge Physics</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7">Upon detonation of the Comp A5 fill, the detonation wave collapses the copper liner inward at ~2 km/s. The Munroe effect creates a hyper-velocity jet (tip ~6 km/s, tail ~2 km/s) and a slower-moving slug. The jet's kinetic energy density exceeds the yield strength of armor steel by orders of magnitude, penetrating via hydrodynamic flow — not melting. Penetration follows the Birkhoff formula: <code>P/L = √(ρj/ρt)</code> where P=penetration, L=jet length, ρj=jet density, ρt=target density. For copper jet vs. steel: P/L ≈ 0.94.</p>
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7;margin-top:.5rem">Critical manufacturing parameters: wall thickness uniformity determines jet coherence; asymmetry >0.03mm TIR causes jet breakup and reduces penetration 20–40%. Grain size affects ductility during collapse — too coarse and the liner fragments instead of forming a continuous jet. OFHC copper is specified because oxygen inclusions create porosity that disrupts jet formation.</p>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Quality Requirements</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th>Specification</th><th>Method</th><th>Criticality</th></tr></thead>
+    <tbody>
+      <tr><td>Wall Thickness Uniformity</td><td>±0.05mm</td><td>CMM (12-point scan)</td><td style="color:var(--red)">CRITICAL</td></tr>
+      <tr><td>Concentricity (TIR)</td><td>≤0.03mm</td><td>V-block / CMM</td><td style="color:var(--red)">CRITICAL</td></tr>
+      <tr><td>Surface Finish (inner)</td><td>≤0.8 µm Ra</td><td>Profilometer</td><td style="color:var(--yellow)">MAJOR</td></tr>
+      <tr><td>Weight</td><td>18g ±0.5g</td><td>Analytical balance</td><td style="color:var(--yellow)">MAJOR</td></tr>
+      <tr><td>Grain Size</td><td>ASTM 8–10</td><td>Metallographic section</td><td style="color:var(--yellow)">MAJOR</td></tr>
+      <tr><td>Oxygen Content</td><td>≤10 ppm</td><td>Inert gas fusion</td><td style="color:var(--red)">CRITICAL</td></tr>
+      <tr><td>Cone Angle</td><td>42° ±0.5°</td><td>Optical comparator</td><td style="color:var(--red)">CRITICAL</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- COMP A5 EXPLOSIVE FILL -->
+<div class="section" id="sec-comp-explosive">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>Composition A5 Explosive Fill</h1>
+    <p>RDX-based pressed explosive charge providing the detonation energy for both the shaped charge jet and fragmentation effects. Primary lethal mechanism of the M433A1 round.</p>
+  </div>
+  <div class="notice notice-danger">⚠️ CRITICAL EXPLOSIVE OPERATION — Comp A5 pressing is the highest-hazard operation in M433A1 production. Maximum of 3 personnel in the pressing bay. All personnel must wear anti-static clothing, conductive footwear, and eye protection. No ferrous tools — use brass or beryllium copper tooling only.</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Composition</div><div class="spec-value">RDX 98.5% <span class="spec-unit">/ Stearic Acid 1.5%</span></div></div>
+    <div class="spec-item"><div class="spec-label">RDX Type</div><div class="spec-value">Class A <span class="spec-unit">per MIL-DTL-398</span></div></div>
+    <div class="spec-item"><div class="spec-label">Fill Weight</div><div class="spec-value">39g <span class="spec-unit">±0.5g</span></div></div>
+    <div class="spec-item"><div class="spec-label">Density (pressed)</div><div class="spec-value">1.63 g/cm³ <span class="spec-unit">±0.02 (95% TMD)</span></div></div>
+    <div class="spec-item"><div class="spec-label">TMD</div><div class="spec-value">1.717 g/cm³ <span class="spec-unit">(theoretical)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Pressing Pressure</div><div class="spec-value">20,000 PSI <span class="spec-unit">(138 MPa)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Dwell Time</div><div class="spec-value">5 sec <span class="spec-unit">under pressure</span></div></div>
+    <div class="spec-item"><div class="spec-label">Det. Velocity</div><div class="spec-value">8,380 m/s <span class="spec-unit">at 1.63 g/cm³</span></div></div>
+    <div class="spec-item"><div class="spec-label">Impact Sensitivity</div><div class="spec-value">7.4 J <span class="spec-unit">(BAM 50% height)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Friction Sensitivity</div><div class="spec-value">120 N <span class="spec-unit">(BAM friction)</span></div></div>
+    <div class="spec-item"><div class="spec-label">ESD Sensitivity</div><div class="spec-value">>0.25 J <span class="spec-unit">(safe to handle)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Bulk Storage</div><div class="spec-value">Class 1.1D <span class="spec-unit">(mass detonating)</span></div></div>
+    <div class="spec-item"><div class="spec-label">As Loaded</div><div class="spec-value">Class 1.4S <span class="spec-unit">(article, no mass det)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Vacuum Stability</div><div class="spec-value">&lt;2.0 mL <span class="spec-unit">gas/g @ 120°C/40hr</span></div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Pressing Parameters</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7">Comp A5 is pressed directly into the projectile body (in-situ pressing) in a single increment. The liner is pre-positioned in the body before pressing. Die and punch are hardened stainless steel, polished to &lt;0.4 µm Ra. Pressing force is applied gradually (ramp rate ≤5,000 PSI/sec) to avoid adiabatic heating. Maximum pressing temperature must remain below 80°C — thermocouple monitoring on die is mandatory. Pressed pellet is weighed and density-verified (water immersion method) before proceeding.</p>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Explosive Safety Classification</h3>
+  <table>
+    <thead><tr><th>Form</th><th>HD Class</th><th>Compatibility Group</th><th>Storage Requirement</th></tr></thead>
+    <tbody>
+      <tr><td>Bulk RDX powder</td><td>1.1</td><td>D</td><td>Earth-covered magazine, Q-D per DDESB 6055.09</td></tr>
+      <tr><td>Comp A5 blend (pre-press)</td><td>1.1</td><td>D</td><td>Same as bulk RDX</td></tr>
+      <tr><td>Pressed in projectile body</td><td>1.1</td><td>D</td><td>Until fuze installed and tested</td></tr>
+      <tr><td>Complete round (fuzed)</td><td>1.4</td><td>S</td><td>Standard ammunition storage per SB 742-1</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- STEEL FRAG BODY -->
+<div class="section" id="sec-comp-fragbody">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>Steel Fragmentation Body</h1>
+    <p>Pre-scored AISI 1045 carbon steel body that provides controlled fragmentation upon detonation. The notched pattern ensures consistent fragment size and distribution.</p>
+  </div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Material</div><div class="spec-value">AISI 1045 <span class="spec-unit">Medium Carbon Steel</span></div></div>
+    <div class="spec-item"><div class="spec-label">Heat Treatment</div><div class="spec-value">Normalize <span class="spec-unit">845°C / Air Cool</span></div></div>
+    <div class="spec-item"><div class="spec-label">Hardness</div><div class="spec-value">HRC 20–28</div></div>
+    <div class="spec-item"><div class="spec-label">Weight</div><div class="spec-value">65g <span class="spec-unit">±2g</span></div></div>
+    <div class="spec-item"><div class="spec-label">Wall Thickness</div><div class="spec-value">3.0mm <span class="spec-unit">±0.15mm</span></div></div>
+    <div class="spec-item"><div class="spec-label">Score Depth</div><div class="spec-value">1.5mm <span class="spec-unit">(50% wall)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Score Pattern</div><div class="spec-value">Diamond <span class="spec-unit">~3mm pitch</span></div></div>
+    <div class="spec-item"><div class="spec-label">Fragment Count</div><div class="spec-value">~300 <span class="spec-unit">primary fragments</span></div></div>
+    <div class="spec-item"><div class="spec-label">Avg Fragment Mass</div><div class="spec-value">0.2g <span class="spec-unit">per primary frag</span></div></div>
+    <div class="spec-item"><div class="spec-label">Initial Frag Velocity</div><div class="spec-value">~1,500 m/s</div></div>
+    <div class="spec-item"><div class="spec-label">Lethal Radius</div><div class="spec-value">5m</div></div>
+    <div class="spec-item"><div class="spec-label">Casualty Radius</div><div class="spec-value">15m</div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Fragment Distribution Analysis</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7">Arena fragmentation testing per MIL-STD-2105 demonstrates: ~300 primary fragments from the scored body, average mass 0.2g, distributed in a toroidal pattern concentrated ±30° from the equator. Fragment velocity at 5m is ~1,200 m/s (sufficient to penetrate 3mm mild steel). The scoring pattern is designed to produce fragments in the 0.1–0.4g range — heavy enough for lethality at range but light enough for high count. Fragments below 0.1g are considered secondary (from unscored areas) and contribute to casualty effect at close range.</p>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Manufacturing & Heat Treatment</h3>
+  <div class="card">
+    <ol style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+      <li><strong style="color:var(--text)">Bar Stock:</strong> AISI 1045 per ASTM A108, cold-finished, certified chemistry</li>
+      <li><strong style="color:var(--text)">Machining:</strong> CNC lathe — rough bore, rough OD, rough threads</li>
+      <li><strong style="color:var(--text)">Scoring:</strong> Internal diamond-pattern scoring via EDM or broaching, 1.5mm depth (50% of wall)</li>
+      <li><strong style="color:var(--text)">Normalizing:</strong> Heat to 845°C, hold 30 min, air cool to achieve HRC 20–28</li>
+      <li><strong style="color:var(--text)">Finish Machining:</strong> Finish bore, threads, and OD to final dimensions</li>
+      <li><strong style="color:var(--text)">Surface Treatment:</strong> Phosphate coating per MIL-DTL-16232 (corrosion protection)</li>
+      <li><strong style="color:var(--text)">Inspection:</strong> 100% dimensional + hardness check; SPC on scoring depth</li>
+    </ol>
+  </div>
+</div>
+
+<!-- TUNGSTEN FRAGMENT MATRIX -->
+<div class="section" id="sec-comp-tungsten">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>Tungsten Fragment Matrix</h1>
+    <p>Pre-formed tungsten spheres embedded in the plastic ogive body. Provides additional anti-personnel fragmentation with controlled pattern and enhanced lethality over the original M433 steel fragments.</p>
+  </div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Material</div><div class="spec-value">Tungsten <span class="spec-unit">(≥97% W, sintered)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Sphere Diameter</div><div class="spec-value">2.5mm <span class="spec-unit">±0.05mm</span></div></div>
+    <div class="spec-item"><div class="spec-label">Sphere Weight</div><div class="spec-value">0.15g <span class="spec-unit">each (nominal)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Count Per Round</div><div class="spec-value">~400 <span class="spec-unit">spheres</span></div></div>
+    <div class="spec-item"><div class="spec-label">Total W Weight</div><div class="spec-value">~60g</div></div>
+    <div class="spec-item"><div class="spec-label">Matrix Material</div><div class="spec-value">Glass-Filled Nylon <span class="spec-unit">(PA66-GF30)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Molding Process</div><div class="spec-value">Insert Molding <span class="spec-unit">(injection)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Fragment Velocity</div><div class="spec-value">~1,200 m/s <span class="spec-unit">initial</span></div></div>
+    <div class="spec-item"><div class="spec-label">Dispersion Pattern</div><div class="spec-value">360° Radial <span class="spec-unit">uniform</span></div></div>
+    <div class="spec-item"><div class="spec-label">Density (W)</div><div class="spec-value">19.25 g/cm³ <span class="spec-unit">(2.45× steel)</span></div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Advantage Over Steel Fragments</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7">Tungsten's density (19.25 g/cm³) is 2.45× that of steel (7.85 g/cm³). For the same fragment mass, a tungsten sphere has smaller cross-section and thus higher sectional density — meaning it retains velocity better over distance. A 0.15g tungsten sphere at 1,200 m/s carries 108 J of kinetic energy and maintains lethal velocity (>60 J threshold per NATO STANAG 2920) to ~15m, compared to ~10m for equivalent steel fragments. The spherical shape also produces a predictable drag coefficient (Cd ≈ 0.47) for consistent ballistic modeling.</p>
+  </div>
+</div>
+
+<!-- PLASTIC OGIVE -->
+<div class="section" id="sec-comp-ogive">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>Plastic Ogive</h1>
+    <p>Injection-molded aerodynamic body that houses the tungsten fragment matrix and provides the projectile's aerodynamic profile. Designed to break away on impact to allow fuze function.</p>
+  </div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Material</div><div class="spec-value">PA66-GF30 <span class="spec-unit">(Glass-Filled Nylon)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Manufacturing</div><div class="spec-value">Injection Molding <span class="spec-unit">(insert mold)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Ogive Profile</div><div class="spec-value">Secant <span class="spec-unit">~5 caliber radius</span></div></div>
+    <div class="spec-item"><div class="spec-label">Ballistic Coeff.</div><div class="spec-value">C₇ = 0.0027 <span class="spec-unit">(low BC, subsonic)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Mold Cavities</div><div class="spec-value">4-cavity <span class="spec-unit">(typical production)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Melt Temp</div><div class="spec-value">280°C <span class="spec-unit">processing</span></div></div>
+    <div class="spec-item"><div class="spec-label">Color</div><div class="spec-value">Olive Drab <span class="spec-unit">(Fed-STD-595 #34079)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Break-Away Force</div><div class="spec-value">500–800 N <span class="spec-unit">axial</span></div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Impact Break-Away</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7">The ogive must fracture cleanly on impact to expose the fuze to the target surface. The break-away zone is engineered via a stress-concentration groove at the ogive-body junction. The force must be low enough to ensure function at oblique angles (up to 70°) and on soft targets (sand, soil), but high enough to survive launch forces (~5,000g setback for ~10ms). The glass-fiber orientation from injection molding is controlled to create the desired failure mode — circumferential fibers at the break zone, axial fibers in the main body for hoop strength during flight.</p>
+  </div>
+</div>
+
+<!-- M550A1 FUZE -->
+<div class="section" id="sec-comp-fuze">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>M550A1 Point Detonating Fuze</h1>
+    <p>Superquick / graze function point detonating fuze with setback and spin arming. The M550A1 is the improved variant with enhanced graze sensitivity for oblique-impact reliability.</p>
+  </div>
+  <div class="notice notice-danger">⚠️ EXPLOSIVE COMPONENT — The M550A1 contains a detonator (lead azide/RDX) and booster (tetryl). It is the most hazard-sensitive component in the round. Handle per TB 700-2, Chapter 4. Fuzes must remain in protective containers until immediately before installation.</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Function Mode</div><div class="spec-value">Superquick <span class="spec-unit">+ Graze</span></div></div>
+    <div class="spec-item"><div class="spec-label">Arming Distance</div><div class="spec-value">14–28m <span class="spec-unit">from muzzle</span></div></div>
+    <div class="spec-item"><div class="spec-label">Arming Method</div><div class="spec-value">Setback + Spin <span class="spec-unit">(dual safety)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Setback Force</div><div class="spec-value">~5,000g <span class="spec-unit">(10ms)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Spin Rate</div><div class="spec-value">~3,700 RPM <span class="spec-unit">(at muzzle)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Detonator</div><div class="spec-value">Lead Azide <span class="spec-unit">/RDX</span></div></div>
+    <div class="spec-item"><div class="spec-label">Booster</div><div class="spec-value">Tetryl <span class="spec-unit">~1.5g</span></div></div>
+    <div class="spec-item"><div class="spec-label">Graze Angle</div><div class="spec-value">Up to 70° <span class="spec-unit">obliquity</span></div></div>
+    <div class="spec-item"><div class="spec-label">Function Reliability</div><div class="spec-value">99.2% <span class="spec-unit">(all conditions)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Bore Safety</div><div class="spec-value">Rotor OOL <span class="spec-unit">(out-of-line)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Dud Rate</div><div class="spec-value">&lt;1% <span class="spec-unit">(per MIL-STD-331)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Thread</div><div class="spec-value">1.0"–18 UNEF <span class="spec-unit">(standard fuze well)</span></div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Component Breakdown</h3>
+  <div class="card">
+    <table style="margin:0">
+      <thead><tr><th>Component</th><th>Function</th><th>Material/Explosive</th></tr></thead>
+      <tbody>
+        <tr><td>Firing Pin</td><td>Strikes detonator on impact</td><td>Hardened steel (HRC 58–62)</td></tr>
+        <tr><td>Creep Spring</td><td>Keeps firing pin retracted in transit/bore</td><td>Music wire (ASTM A228)</td></tr>
+        <tr><td>Rotor (Safety/Arming)</td><td>Bore safety — detonator out-of-line until armed</td><td>Aluminum / lead azide charge</td></tr>
+        <tr><td>Setback Pin</td><td>Releases rotor lock on launch (acceleration)</td><td>Brass</td></tr>
+        <tr><td>Centrifugal Detents</td><td>Release rotor at correct spin rate</td><td>Steel balls in spring seats</td></tr>
+        <tr><td>Detonator</td><td>Primary explosive → initiates booster</td><td>Lead azide / PETN (<0.1g)</td></tr>
+        <tr><td>Booster</td><td>Amplifies detonator to initiate main charge</td><td>Tetryl (~1.5g), pressed pellet</td></tr>
+        <tr><td>Graze Element</td><td>Fires on oblique impact (shear pin mechanism)</td><td>Steel inertial mass + shear pin</td></tr>
+        <tr><td>O-Ring Seal</td><td>Waterproofing at fuze-body interface</td><td>Buna-N (MIL-PRF-28776)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Arming Sequence</h3>
+  <div class="card">
+    <ol style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+      <li><strong style="color:var(--text)">In Storage:</strong> Rotor is locked out-of-line (OOL) by setback pin and centrifugal detents. Detonator is not aligned with firing pin or booster. The round is bore-safe.</li>
+      <li><strong style="color:var(--text)">Launch (Setback):</strong> ~5,000g acceleration drives setback pin rearward, releasing first safety interlock</li>
+      <li><strong style="color:var(--text)">In-Bore Spin-Up:</strong> Rifling engages rotating band, spinning projectile to ~3,700 RPM</li>
+      <li><strong style="color:var(--text)">Post-Muzzle (14–28m):</strong> Centrifugal force on detents overcomes spring, releasing rotor. Rotor aligns detonator in-line with firing pin and booster. Fuze is now ARMED.</li>
+      <li><strong style="color:var(--text)">Impact (SQ):</strong> Nose contact drives firing pin through creep spring into detonator → detonator → booster → main charge</li>
+      <li><strong style="color:var(--text)">Impact (Graze):</strong> At oblique angles, inertial element shears graze pin, driving detonator into firing pin via alternative path → same explosive train</li>
+    </ol>
+  </div>
+</div>
+
+<!-- COPPER ROTATING BAND -->
+<div class="section" id="sec-comp-band">
+  <div class="section-header">
+    <div class="classification">CONTROLLED TECHNICAL DATA</div>
+    <h1>Copper Rotating Band</h1>
+    <p>Pre-engraved or swaged pure copper band that engages the rifling in the M203/M320 barrel, providing spin stabilization and obturation (gas seal) for the projectile.</p>
+  </div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-label">Material</div><div class="spec-value">C11000 Copper <span class="spec-unit">(99.9% ETP)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Installation</div><div class="spec-value">Swaged <span class="spec-unit">into groove on body</span></div></div>
+    <div class="spec-item"><div class="spec-label">Band Width</div><div class="spec-value">6.0mm <span class="spec-unit">±0.2mm</span></div></div>
+    <div class="spec-item"><div class="spec-label">OD (pre-engrave)</div><div class="spec-value">40.5mm <span class="spec-unit">±0.05mm</span></div></div>
+    <div class="spec-item"><div class="spec-label">Groove Depth</div><div class="spec-value">1.0mm <span class="spec-unit">(in body)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Rifling Engagement</div><div class="spec-value">12 lands <span class="spec-unit">RH twist 1:48"</span></div></div>
+    <div class="spec-item"><div class="spec-label">Engraving Force</div><div class="spec-value">~800 N <span class="spec-unit">(chamber pressure driven)</span></div></div>
+    <div class="spec-item"><div class="spec-label">Spin Imparted</div><div class="spec-value">~3,700 RPM <span class="spec-unit">at 76 m/s</span></div></div>
+  </div>
+  <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Function & Requirements</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7">The rotating band serves three critical functions: (1) <strong style="color:var(--text)">Spin stabilization</strong> — engages rifling to impart gyroscopic stability for accurate flight; (2) <strong style="color:var(--text)">Obturation</strong> — deforms into rifling grooves to seal propellant gases behind the projectile; (3) <strong style="color:var(--text)">Centering</strong> — keeps the projectile axially aligned in the bore. Pure copper is used because it is soft enough to engrave cleanly into rifling without damaging the barrel (HV 40–60) yet strong enough to transmit the torque needed for spin-up. The band must be free of voids, cracks, and inclusions that could cause gas blow-by or asymmetric engraving.</p>
+  </div>
+</div>
+
+<!-- =====================================================
+     SECTION 3: ASSEMBLY PROCESS
+     ===================================================== -->
+<div class="section" id="sec-assembly">
+  <div class="section-header">
+    <div class="classification">CONTROLLED — ITAR RESTRICTED</div>
+    <h1>Assembly Process — Interactive Flowchart</h1>
+    <p>Complete 17-step production sequence from receiving inspection through palletization. Click any step to expand detailed work instructions, equipment, and quality requirements.</p>
+  </div>
+  <div class="notice notice-warn">⚡ Color coding: <span style="color:var(--accent);font-weight:600">■ GREEN</span> = Standard operations | <span style="color:var(--yellow);font-weight:600">■ YELLOW</span> = Caution (energetics handling) | <span style="color:var(--red);font-weight:600">■ RED</span> = Critical explosive operations (personnel limits apply)</div>
+
+  <div class="process-flowchart" id="assemblyFlow"></div>
+</div>
+
+<!-- =====================================================
+     SECTION 4: QUALITY CONTROL
+     ===================================================== -->
+<div class="section" id="sec-quality">
+  <div class="section-header">
+    <div class="classification">CONTROLLED — ITAR RESTRICTED</div>
+    <h1>Quality Control Manual</h1>
+    <p>Comprehensive quality assurance program per MIL-STD-1916 and AS9100 requirements. Covers incoming, in-process, and final inspection, SPC, gauge control, and non-conformance management.</p>
+  </div>
+
+  <div class="tabs" id="qcTabs">
+    <button class="tab-btn active" data-tab="qc-incoming">Incoming</button>
+    <button class="tab-btn" data-tab="qc-inprocess">In-Process</button>
+    <button class="tab-btn" data-tab="qc-final">Final</button>
+    <button class="tab-btn" data-tab="qc-sampling">Sampling Plans</button>
+    <button class="tab-btn" data-tab="qc-spc">SPC</button>
+    <button class="tab-btn" data-tab="qc-gauge">Gauge R&R</button>
+    <button class="tab-btn" data-tab="qc-ncr">NCR/CAPA</button>
+    <button class="tab-btn" data-tab="qc-fat">FAT</button>
+    <button class="tab-btn" data-tab="qc-environmental">Environmental</button>
+    <button class="tab-btn" data-tab="qc-traceability">Traceability</button>
+  </div>
+
+  <!-- QC: Incoming -->
+  <div class="tab-content active" id="tc-qc-incoming">
+    <h3 style="margin-bottom:1rem">Incoming Inspection Procedures by Component</h3>
+    <table>
+      <thead><tr><th>Component</th><th>Inspection Level</th><th>Key Checks</th><th>AQL</th><th>Documentation</th></tr></thead>
+      <tbody>
+        <tr><td>M118A1 Case</td><td>Level II (Normal)</td><td>Dimensions, anodize thickness, headstamp, visual</td><td>1.0%</td><td>CoC, CMM data, material cert</td></tr>
+        <tr><td>M42A1 Primer</td><td>Level III (Tightened)</td><td>Sensitivity test, visual, waterproof, dimensions</td><td>0.4%</td><td>CoC, lot test data, stability cert</td></tr>
+        <tr><td>M2 Propellant</td><td>Level III</td><td>Granulation, moisture, stability, chemistry</td><td>0.4%</td><td>CoC, ballistic lot acceptance</td></tr>
+        <tr><td>Copper Liner</td><td>Level II</td><td>Concentricity, wall thickness, weight, O₂ content</td><td>0.65%</td><td>CoC, material cert (C10200)</td></tr>
+        <tr><td>Comp A5</td><td>Level S-4 (Special)</td><td>RDX purity, particle size, moisture, sensitivity</td><td>Per lot test</td><td>CoC, MSDS, sensitivity data</td></tr>
+        <tr><td>Frag Body</td><td>Level II</td><td>Dimensions, hardness, score depth, threads</td><td>1.0%</td><td>CoC, material cert, heat treat record</td></tr>
+        <tr><td>Tungsten Spheres</td><td>Level II</td><td>Diameter, weight, density, sphericity</td><td>1.0%</td><td>CoC, material analysis</td></tr>
+        <tr><td>Ogive (molded)</td><td>Level II</td><td>Dimensions, break-away force, color, W count</td><td>1.0%</td><td>CoC, process parameters</td></tr>
+        <tr><td>M550A1 Fuze</td><td>Level III</td><td>Dimensions, function test (sample), visual, thread</td><td>0.4%</td><td>CoC, lot test report, proof data</td></tr>
+        <tr><td>Rotating Band</td><td>Level I</td><td>OD, width, visual (no cracks/voids)</td><td>2.5%</td><td>CoC, material cert</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- QC: In-Process -->
+  <div class="tab-content" id="tc-qc-inprocess">
+    <h3 style="margin-bottom:1rem">In-Process Inspection Requirements</h3>
+    <table>
+      <thead><tr><th>Operation</th><th>Check</th><th>Method</th><th>Frequency</th><th>Tolerance</th></tr></thead>
+      <tbody>
+        <tr><td>Primer Installation</td><td>Seat depth</td><td>Depth gauge</td><td>100%</td><td>3.81mm ±0.05mm</td></tr>
+        <tr><td>Primer Installation</td><td>Flush/protrusion</td><td>Visual + gauge</td><td>100%</td><td>No protrusion above case head</td></tr>
+        <tr><td>Propellant Loading</td><td>Charge weight</td><td>Analytical balance</td><td>Every 50th (SPC)</td><td>4.2g ±0.05g</td></tr>
+        <tr><td>Explosive Pressing</td><td>Fill weight</td><td>Analytical balance</td><td>100%</td><td>39g ±0.5g</td></tr>
+        <tr><td>Explosive Pressing</td><td>Density</td><td>Water immersion</td><td>Every 25th</td><td>1.63 ±0.02 g/cm³</td></tr>
+        <tr><td>Explosive Pressing</td><td>Die temperature</td><td>Thermocouple</td><td>Continuous</td><td>≤80°C</td></tr>
+        <tr><td>Fuze Installation</td><td>Torque</td><td>Torque wrench</td><td>100%</td><td>15 ±2 ft-lb</td></tr>
+        <tr><td>Projectile Seating</td><td>Seat depth</td><td>Depth gauge</td><td>100%</td><td>Per drawing ±0.1mm</td></tr>
+        <tr><td>Crimp</td><td>Crimp depth & uniformity</td><td>Go/No-Go gauge</td><td>100%</td><td>Per drawing</td></tr>
+        <tr><td>Sealant Application</td><td>Coverage</td><td>Visual (UV lamp)</td><td>100%</td><td>360° coverage, no gaps</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- QC: Final -->
+  <div class="tab-content" id="tc-qc-final">
+    <h3 style="margin-bottom:1rem">Final Inspection Procedures</h3>
+    <table>
+      <thead><tr><th>Check</th><th>Specification</th><th>Method</th><th>Accept/Reject</th></tr></thead>
+      <tbody>
+        <tr><td>Overall Length</td><td>112mm ±0.5mm</td><td>Caliper / gauge</td><td>100% check</td></tr>
+        <tr><td>Complete Weight</td><td>340g ±5g</td><td>Scale</td><td>100% check</td></tr>
+        <tr><td>Max Diameter</td><td>40.0mm (body) ±0.08mm</td><td>Ring gauge</td><td>100% check</td></tr>
+        <tr><td>Chamber Check</td><td>Fits reference chamber</td><td>Go gauge</td><td>100% check</td></tr>
+        <tr><td>Visual Inspection</td><td>No dents, cracks, sealant defects</td><td>Visual (10× loupe)</td><td>100% check</td></tr>
+        <tr><td>Lot Marking</td><td>Correct lot #, date, mfr code</td><td>Visual</td><td>100% check</td></tr>
+        <tr><td>Waterproof Seal</td><td>24hr immersion, no leakage</td><td>Immersion + visual</td><td>Sample per lot</td></tr>
+        <tr><td>Proof (Pressure)</td><td>≤3,000 PSI MAP</td><td>Instrumented barrel (piezo)</td><td>Per MIL-STD-331</td></tr>
+        <tr><td>Proof (Velocity)</td><td>76 ±3 m/s</td><td>Chronograph</td><td>10 rounds per lot</td></tr>
+        <tr><td>Function Test</td><td>Fuze function, detonation</td><td>Live fire vs. witness plate</td><td>Per lot acceptance</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- QC: Sampling Plans -->
+  <div class="tab-content" id="tc-qc-sampling">
+    <h3 style="margin-bottom:1rem">MIL-STD-1916 Sampling Plans</h3>
+    <div class="card">
+      <p style="color:var(--text2);font-size:.9rem;line-height:1.7;margin-bottom:1rem">MIL-STD-1916 replaced MIL-STD-105 (AQL-based) with a zero-acceptance-number approach. The philosophy: <strong style="color:var(--text)">if a single defective is found in the sample, the lot is rejected</strong>. Verification levels (VL-I through VL-VII) determine sample sizes.</p>
+    </div>
+    <table>
+      <thead><tr><th>Lot Size</th><th>VL-II (Reduced)</th><th>VL-IV (Normal)</th><th>VL-VII (Tightened)</th></tr></thead>
+      <tbody>
+        <tr><td>2–8</td><td>All</td><td>All</td><td>All</td></tr>
+        <tr><td>9–15</td><td>3</td><td>5</td><td>All</td></tr>
+        <tr><td>16–25</td><td>3</td><td>7</td><td>14</td></tr>
+        <tr><td>26–50</td><td>3</td><td>10</td><td>18</td></tr>
+        <tr><td>51–90</td><td>5</td><td>12</td><td>22</td></tr>
+        <tr><td>91–150</td><td>5</td><td>18</td><td>29</td></tr>
+        <tr><td>151–280</td><td>7</td><td>22</td><td>38</td></tr>
+        <tr><td>281–500</td><td>10</td><td>29</td><td>46</td></tr>
+        <tr><td>501–1,200</td><td>12</td><td>38</td><td>58</td></tr>
+        <tr><td>1,201–3,200</td><td>18</td><td>46</td><td>74</td></tr>
+        <tr><td>3,201–10,000</td><td>22</td><td>58</td><td>92</td></tr>
+        <tr><td>10,001–35,000</td><td>29</td><td>74</td><td>116</td></tr>
+        <tr><td>35,001–150,000</td><td>38</td><td>92</td><td>144</td></tr>
+      </tbody>
+    </table>
+    <div class="notice notice-info" style="margin-top:1rem">ℹ️ Accept number = 0 for all sample sizes. Reject on first defective found. Switching rules: 10 consecutive lots accepted → switch to VL-II; 2/5 lots rejected → switch to VL-VII.</div>
+  </div>
+
+  <!-- QC: SPC -->
+  <div class="tab-content" id="tc-qc-spc">
+    <h3 style="margin-bottom:1rem">Statistical Process Control (SPC)</h3>
+    <div class="card">
+      <h4 style="margin-bottom:.5rem">X-bar and R Chart Setup</h4>
+      <p style="color:var(--text2);font-size:.9rem;line-height:1.7">For each critical dimension, maintain X-bar (mean) and R (range) charts with subgroup size n=5. Sample every 50th unit (or per shift minimum). Calculate control limits from initial 25 subgroups:</p>
+      <div style="margin:1rem 0;padding:1rem;background:var(--card2);border-radius:var(--radius);font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent)">
+        UCL_Xbar = X̄ + A₂ × R̄ &nbsp;&nbsp;(A₂ = 0.577 for n=5)<br>
+        LCL_Xbar = X̄ − A₂ × R̄<br>
+        UCL_R = D₄ × R̄ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(D₄ = 2.114 for n=5)<br>
+        LCL_R = D₃ × R̄ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(D₃ = 0 for n=5)
+      </div>
+      <h4 style="margin-top:1rem;margin-bottom:.5rem">Required Cpk Values</h4>
+      <table>
+        <thead><tr><th>Characteristic</th><th>Min Cpk</th><th>Target Cpk</th></tr></thead>
+        <tbody>
+          <tr><td>Critical (Safety) Dimensions</td><td>1.67</td><td>2.00</td></tr>
+          <tr><td>Major Dimensions</td><td>1.33</td><td>1.67</td></tr>
+          <tr><td>Minor Dimensions</td><td>1.00</td><td>1.33</td></tr>
+          <tr><td>Explosive Fill Weight</td><td>1.67</td><td>2.00</td></tr>
+          <tr><td>Propellant Charge Weight</td><td>1.67</td><td>2.00</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--text2);font-size:.88rem;margin-top:1rem">Western Group (Nelson) Rules for out-of-control signals: (1) Any single point beyond 3σ; (2) 9 consecutive points on same side of center; (3) 6 consecutive points trending up/down; (4) 2 of 3 consecutive points beyond 2σ on same side.</p>
+    </div>
+  </div>
+
+  <!-- QC: Gauge R&R -->
+  <div class="tab-content" id="tc-qc-gauge">
+    <h3 style="margin-bottom:1rem">Gauge Repeatability & Reproducibility</h3>
+    <div class="card">
+      <p style="color:var(--text2);font-size:.9rem;line-height:1.7">All measurement systems for critical dimensions must pass GR&R study per AIAG MSA 4th Edition. Three operators, 10 parts, 3 trials each = 90 measurements per study.</p>
+      <table style="margin-top:1rem">
+        <thead><tr><th>%GR&R Result</th><th>Decision</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--accent)">&lt;10%</td><td>Acceptable</td><td>Measurement system approved</td></tr>
+          <tr><td style="color:var(--yellow)">10–30%</td><td>Marginal</td><td>May be acceptable — review with engineering</td></tr>
+          <tr><td style="color:var(--red)">&gt;30%</td><td>Unacceptable</td><td>Must improve measurement system before use</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--text2);font-size:.88rem;margin-top:1rem">Number of distinct categories (ndc) must be ≥5. If ndc &lt;5, the gauge cannot reliably distinguish between parts — resolution is insufficient.</p>
+    </div>
+  </div>
+
+  <!-- QC: NCR/CAPA -->
+  <div class="tab-content" id="tc-qc-ncr">
+    <h3 style="margin-bottom:1rem">Non-Conformance Report (NCR) & CAPA Process</h3>
+    <div class="ncr-flow">
+      <div class="ncr-box" style="border-color:var(--red)">Defect Detected</div>
+      <div class="ncr-arrow">→</div>
+      <div class="ncr-box">Quarantine Material</div>
+      <div class="ncr-arrow">→</div>
+      <div class="ncr-box">Issue NCR</div>
+      <div class="ncr-arrow">→</div>
+      <div class="ncr-box">MRB Review</div>
+      <div class="ncr-arrow">→</div>
+      <div class="ncr-box" style="border-color:var(--accent)">Disposition</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin:1rem 0">
+      <div class="card" style="border-left:3px solid var(--accent)"><h4>Use As-Is</h4><p style="font-size:.85rem;color:var(--text2)">Engineering evaluation confirms no impact on fit/form/function. Requires DAR/DCMA approval for government contracts.</p></div>
+      <div class="card" style="border-left:3px solid var(--yellow)"><h4>Rework</h4><p style="font-size:.85rem;color:var(--text2)">Correctable defect. Rework instruction written, re-inspect after rework. Re-work limits apply (max 2 rework cycles).</p></div>
+      <div class="card" style="border-left:3px solid var(--blue)"><h4>Repair</h4><p style="font-size:.85rem;color:var(--text2)">Restore to usable condition per approved repair procedure. Engineering approval required. Documented in lot history.</p></div>
+      <div class="card" style="border-left:3px solid var(--red)"><h4>Scrap</h4><p style="font-size:.85rem;color:var(--text2)">Non-recoverable. Explosive components require demil per DoD 4160.28-M. Scrap value recovery for metallic components.</p></div>
+    </div>
+    <h4 style="margin-top:1rem">CAPA (Corrective and Preventive Action)</h4>
+    <div class="card">
+      <ol style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li><strong style="color:var(--text)">Problem Definition:</strong> 5-Why root cause analysis (mandatory for critical/safety NCRs)</li>
+        <li><strong style="color:var(--text)">Containment:</strong> Immediate action to prevent further defective output</li>
+        <li><strong style="color:var(--text)">Root Cause:</strong> Fishbone (Ishikawa) diagram — Man, Machine, Material, Method, Measurement, Environment</li>
+        <li><strong style="color:var(--text)">Corrective Action:</strong> Eliminate root cause, update procedures/work instructions</li>
+        <li><strong style="color:var(--text)">Preventive Action:</strong> Systemic improvements (error-proofing, poka-yoke, design change)</li>
+        <li><strong style="color:var(--text)">Verification:</strong> Confirm actions effective — measure results over 90-day monitoring period</li>
+        <li><strong style="color:var(--text)">Closure:</strong> QA Manager sign-off after verification period</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- QC: FAT -->
+  <div class="tab-content" id="tc-qc-fat">
+    <h3 style="margin-bottom:1rem">First Article Testing (FAT) Requirements</h3>
+    <div class="notice notice-info">ℹ️ FAT is required per the contract Data Item Description (DID) and AS9102. FAT must be completed and approved before production delivery begins. Re-FAT is required for any design change, process change, or production interruption &gt;12 months.</div>
+    <div class="card">
+      <h4>FAT Checklist</h4>
+      <table style="margin-top:.5rem">
+        <thead><tr><th>Item</th><th>Requirement</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Dimensional Inspection (all drawings)</td><td>100% per AS9102 Form 3</td><td><input type="checkbox"> Complete</td></tr>
+          <tr><td>Material Certifications</td><td>All components vs. TDP specs</td><td><input type="checkbox"> Complete</td></tr>
+          <tr><td>Process Certifications</td><td>Heat treat, anodize, plating, NDT</td><td><input type="checkbox"> Complete</td></tr>
+          <tr><td>Ballistic Testing</td><td>Velocity, pressure, accuracy</td><td><input type="checkbox"> Complete</td></tr>
+          <tr><td>Function Testing</td><td>Fuze function, detonation</td><td><input type="checkbox"> Complete</td></tr>
+          <tr><td>Penetration Testing</td><td>≥63mm RHA at 0° obliquity</td><td><input type="checkbox"> Complete</td></tr>
+          <tr><td>Fragmentation Arena</td><td>Per MIL-STD-2105</td><td><input type="checkbox"> Complete</td></tr>
+          <tr><td>Environmental Testing</td><td>Temperature, humidity, vibration, drop</td><td><input type="checkbox"> Complete</td></tr>
+          <tr><td>Safety Testing</td><td>Cook-off, bullet impact, sympathetic det</td><td><input type="checkbox"> Complete</td></tr>
+          <tr><td>Packaging Test</td><td>Drop, vibration per MIL-STD-2073</td><td><input type="checkbox"> Complete</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- QC: Environmental Testing -->
+  <div class="tab-content" id="tc-qc-environmental">
+    <h3 style="margin-bottom:1rem">Environmental Testing Matrix</h3>
+    <table>
+      <thead><tr><th>Test</th><th>Condition</th><th>Duration</th><th>Standard</th><th>Accept Criteria</th></tr></thead>
+      <tbody>
+        <tr><td>High Temperature Storage</td><td>+63°C</td><td>7 days</td><td>MIL-STD-331</td><td>Function, no cook-off</td></tr>
+        <tr><td>Low Temperature Storage</td><td>−51°C</td><td>7 days</td><td>MIL-STD-331</td><td>Function within 5 seconds</td></tr>
+        <tr><td>Temperature Shock</td><td>−51°C to +63°C (5 cycles)</td><td>8hr/cycle</td><td>MIL-STD-810</td><td>No cracking, function normal</td></tr>
+        <tr><td>Humidity</td><td>95% RH, 40°C</td><td>14 days</td><td>MIL-STD-810</td><td>No corrosion, function normal</td></tr>
+        <tr><td>Vibration (Transit)</td><td>5–500 Hz, 1.04g RMS</td><td>4hr/axis (3 axes)</td><td>MIL-STD-810</td><td>No loosening, function normal</td></tr>
+        <tr><td>Drop (Packaged)</td><td>1.2m onto concrete</td><td>26 drops (faces/edges/corners)</td><td>MIL-STD-2073</td><td>No damage, safe to fire</td></tr>
+        <tr><td>Drop (Unpackaged)</td><td>2m onto sand</td><td>6 drops</td><td>MIL-STD-331</td><td>No function, safe to handle</td></tr>
+        <tr><td>Salt Fog</td><td>5% NaCl, 35°C</td><td>48 hours</td><td>MIL-STD-810</td><td>No structural corrosion</td></tr>
+        <tr><td>Solar Radiation</td><td>1120 W/m², 24hr cycles</td><td>10 days</td><td>MIL-STD-810</td><td>No degradation</td></tr>
+        <tr><td>Immersion</td><td>1m freshwater</td><td>24 hours</td><td>MIL-STD-331</td><td>Waterproof, function normal</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- QC: Traceability -->
+  <div class="tab-content" id="tc-qc-traceability">
+    <h3 style="margin-bottom:1rem">Lot Traceability Requirements</h3>
+    <div class="card">
+      <p style="color:var(--text2);font-size:.9rem;line-height:1.7">Every completed round must be traceable back to the original material lots for all components. The lot number system follows: <code style="color:var(--accent)">GCDL-[YEAR]-[SEQUENTIAL]-[SUBLOT]</code> (e.g., GCDL-2026-0042-A).</p>
+      <h4 style="margin-top:1rem">Records to Maintain (minimum 20 years per ITAR / 10 years per DoD)</h4>
+      <ul style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li>Component lot-to-round lot cross-reference matrix</li>
+        <li>Incoming inspection records (all component lots)</li>
+        <li>In-process inspection data (SPC charts, check sheets)</li>
+        <li>Explosive operations logs (operator, time, quantity, temperature)</li>
+        <li>Final inspection records (dimensional, weight, visual)</li>
+        <li>Ballistic test data (velocity, pressure, accuracy)</li>
+        <li>Packaging and shipping records (destination, date, quantity)</li>
+        <li>Non-conformance and disposition records</li>
+        <li>Calibration records for all gauges and instruments used</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     SECTION 5: REGULATORY & COMPLIANCE
+     ===================================================== -->
+<div class="section" id="sec-regulatory">
+  <div class="section-header">
+    <div class="classification">CONTROLLED — ITAR RESTRICTED</div>
+    <h1>Regulatory & Compliance Guide</h1>
+    <p>Comprehensive regulatory framework for 40mm ammunition manufacturing in the United States. Covers ITAR, ATF, DoD contractor requirements, and explosives safety.</p>
+  </div>
+
+  <div class="tabs" id="regTabs">
+    <button class="tab-btn active" data-tab="reg-itar">ITAR</button>
+    <button class="tab-btn" data-tab="reg-atf">ATF</button>
+    <button class="tab-btn" data-tab="reg-dod">DoD Qualification</button>
+    <button class="tab-btn" data-tab="reg-safety">Explosives Safety</button>
+  </div>
+
+  <div class="tab-content active" id="tc-reg-itar">
+    <h3 style="margin-bottom:1rem">ITAR / USML Compliance</h3>
+    <div class="notice notice-danger">⚠️ The M433A1 is controlled under ITAR as a defense article on the U.S. Munitions List (USML). Unauthorized export, transfer to foreign persons, or disclosure of technical data is a federal crime punishable by up to $1M fine and 20 years imprisonment per violation (22 U.S.C. § 2778).</div>
+    <div class="card">
+      <h4>USML Classification</h4>
+      <table style="margin-top:.5rem">
+        <thead><tr><th>Item</th><th>USML Category</th><th>Subcategory</th></tr></thead>
+        <tbody>
+          <tr><td>Complete M433A1 Round</td><td>Category IV</td><td>(a) — Ammunition/ordnance</td></tr>
+          <tr><td>M550A1 Fuze</td><td>Category IV</td><td>(a) — Components</td></tr>
+          <tr><td>Technical Data Package</td><td>Category IV</td><td>(i) — Technical data</td></tr>
+          <tr><td>Manufacturing Processes</td><td>Category IV</td><td>(i) — Technical data</td></tr>
+          <tr><td>Production Equipment (specialized)</td><td>Category IV</td><td>(h) — Manufacturing equipment</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4>DDTC Registration</h4>
+      <ul style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li>Register with Directorate of Defense Trade Controls (DDTC) as manufacturer/exporter</li>
+        <li>Registration fee: $2,250/year (first year), $2,750 renewal</li>
+        <li>Designate Empowered Official (EO) — must be U.S. person, senior management</li>
+        <li>Maintain active registration before any export, temporary import, or brokering</li>
+        <li>Renewal: annually, submit SF-2032 at least 60 days before expiry</li>
+      </ul>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4>Export License Types</h4>
+      <table>
+        <thead><tr><th>License</th><th>Use</th><th>Typical Processing</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DSP-5</strong></td><td>Permanent export of defense articles</td><td>30–90 days</td></tr>
+          <tr><td><strong>DSP-73</strong></td><td>Temporary export (demo, test, exhibition)</td><td>30–60 days</td></tr>
+          <tr><td><strong>DSP-85</strong></td><td>Temporary import</td><td>30–60 days</td></tr>
+          <tr><td><strong>TAA</strong></td><td>Technical Assistance Agreement (sharing technical data with foreign person)</td><td>60–120 days</td></tr>
+          <tr><td><strong>MLA</strong></td><td>Manufacturing License Agreement (foreign production)</td><td>90–180 days</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4>Technology Control Plan (TCP) Requirements</h4>
+      <ul style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li>Physical security: restricted access areas with badge readers, visitor logs</li>
+        <li>IT security: ITAR data on encrypted, access-controlled servers (no cloud without authorization)</li>
+        <li>Foreign person screening: all employees, visitors, subcontractors verified as U.S. persons or licensed</li>
+        <li>Training: annual ITAR awareness training for all personnel with access to controlled data</li>
+        <li>Marking: all ITAR-controlled documents marked with distribution/export warnings</li>
+        <li>Incident reporting: unauthorized disclosures reported to DDTC within 60 days (mandatory)</li>
+        <li>Record retention: 5 years minimum (all export records, licenses, correspondence)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tc-reg-atf">
+    <h3 style="margin-bottom:1rem">ATF Federal Explosives Requirements</h3>
+    <div class="card">
+      <h4>Federal Explosives License (FEL)</h4>
+      <table style="margin-top:.5rem">
+        <thead><tr><th>License Type</th><th>Activity Authorized</th><th>Fee</th><th>Renewal</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Type 20</strong> — Manufacturer (HE)</td><td>Manufacture of high explosives</td><td>$200/3yr</td><td>Every 3 years</td></tr>
+          <tr><td><strong>Type 01</strong> — Manufacturer (LE)</td><td>Manufacture of ammunition (non-HE)</td><td>$200/3yr</td><td>Every 3 years</td></tr>
+          <tr><td><strong>Type 03</strong> — Dealer</td><td>Purchase and sell explosives</td><td>$200/3yr</td><td>Every 3 years</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--text2);font-size:.88rem;margin-top:1rem">M433A1 production requires Type 20 FEL (high explosives manufacturing). Additionally, a Type 07 FFL (Federal Firearms License — Manufacturer) may be required if the facility also manufactures the launcher or destructive devices.</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4>Storage Requirements (ATF Pub 5400.7)</h4>
+      <ul style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li><strong style="color:var(--text)">Type 1 Magazine:</strong> Permanent structure for bulk explosives (RDX, Comp A5)</li>
+        <li><strong style="color:var(--text)">Type 2 Magazine:</strong> Portable/mobile box for day-use quantities</li>
+        <li><strong style="color:var(--text)">Type 4 Magazine:</strong> For detonators/primers (stored separately from bulk HE)</li>
+        <li>All magazines: locked at all times when unattended, inspected daily</li>
+        <li>Records: daily inventory of all explosive materials received, used, and on-hand</li>
+        <li>ATF inspections: right to inspect without notice during business hours</li>
+        <li>Theft/loss: report to ATF within 24 hours (Form 5400.5)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tc-reg-dod">
+    <h3 style="margin-bottom:1rem">DoD Contractor Qualification</h3>
+    <div class="card">
+      <h4>Qualification Path</h4>
+      <ol style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li><strong style="color:var(--text)">CAGE Code:</strong> Obtain Commercial and Government Entity code via DLA (free)</li>
+        <li><strong style="color:var(--text)">SAM.gov Registration:</strong> System for Award Management — required for all federal contracts</li>
+        <li><strong style="color:var(--text)">DDTC Registration:</strong> ITAR manufacturer registration (as above)</li>
+        <li><strong style="color:var(--text)">ATF FEL:</strong> Type 20 explosives manufacturing license</li>
+        <li><strong style="color:var(--text)">Quality System:</strong> ISO 9001 + AS9100 certification by accredited registrar</li>
+        <li><strong style="color:var(--text)">Facility Clearance:</strong> DSS facility clearance if handling classified information</li>
+        <li><strong style="color:var(--text)">DDESB Approval:</strong> Explosive safety site plan approved by DoD Explosives Safety Board</li>
+        <li><strong style="color:var(--text)">JMC Qualification:</strong> Joint Munitions Command technical evaluation, facility audit, First Article Test</li>
+        <li><strong style="color:var(--text)">DCMA Oversight:</strong> Defense Contract Management Agency assigns QAR (Quality Assurance Representative)</li>
+        <li><strong style="color:var(--text)">Contract Award:</strong> Compete on RFP or sole-source justification</li>
+      </ol>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4>Key Contacts & References</h4>
+      <table>
+        <thead><tr><th>Agency</th><th>Role</th><th>Reference</th></tr></thead>
+        <tbody>
+          <tr><td>Joint Munitions Command (JMC)</td><td>Program manager for conventional ammo</td><td>Rock Island Arsenal, IL</td></tr>
+          <tr><td>PM-MAS</td><td>Project Manager — Maneuver Ammunition Systems</td><td>Picatinny Arsenal, NJ</td></tr>
+          <tr><td>DCMA</td><td>Contract administration & QA oversight</td><td>Assigned to facility</td></tr>
+          <tr><td>ARDEC/DEVCOM AC</td><td>Technical authority (engineering)</td><td>Picatinny Arsenal, NJ</td></tr>
+          <tr><td>DDESB</td><td>Explosives safety approval</td><td>Alexandria, VA</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tc-reg-safety">
+    <h3 style="margin-bottom:1rem">Explosives Safety Regulatory Framework</h3>
+    <div class="card">
+      <h4>DDESB Requirements (DoD 6055.09-M)</h4>
+      <ul style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li><strong style="color:var(--text)">Explosives Safety Site Plan:</strong> Required before any explosive operations commence. Must show all buildings, inhabited building distances (IBD), public traffic route distances (PTR), inter-magazine distances (IMD)</li>
+        <li><strong style="color:var(--text)">Quantity-Distance (Q-D):</strong> Minimum separation distances based on Net Explosive Weight (NEW) per building</li>
+        <li><strong style="color:var(--text)">Maximum Credible Event (MCE):</strong> Worst-case explosive event analysis for each operational building</li>
+        <li><strong style="color:var(--text)">Personnel Limits:</strong> Maximum number of personnel allowed in each explosive area based on MCE and mission necessity</li>
+        <li><strong style="color:var(--text)">Construction Standards:</strong> Barricaded operations for pressing, earth-covered magazines for storage per DoD 6055.09-M</li>
+        <li><strong style="color:var(--text)">Lightning Protection:</strong> Per MIL-STD-1576 and NFPA 780 for all explosive storage and operations areas</li>
+        <li><strong style="color:var(--text)">Waivers/Exemptions:</strong> DDESB-approved for any Q-D deficiency (rare, documented justification required)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     SECTION 6: SAFETY MANUAL
+     ===================================================== -->
+<div class="section" id="sec-safety">
+  <div class="section-header">
+    <div class="classification">CONTROLLED — ITAR RESTRICTED</div>
+    <h1>Safety Manual</h1>
+    <p>Explosives safety procedures, PPE requirements, emergency response, and personnel protection for M433A1 production operations.</p>
+  </div>
+
+  <div class="notice notice-danger">⚠️ ALL PERSONNEL must complete 40-hour Explosives Safety Initial Training per DoD 4145.26-M before entering any production area. Annual refresher training (8 hours) is mandatory. Training records maintained by Safety Officer.</div>
+
+  <h3 style="margin-bottom:1rem">Explosive Safety Classifications by Operation</h3>
+  <table>
+    <thead><tr><th>Operation</th><th>HD/CG</th><th>Max NEW</th><th>Max Personnel</th><th>Hazard Level</th></tr></thead>
+    <tbody>
+      <tr><td>Receiving Inspection (inert)</td><td>N/A</td><td>N/A</td><td>No limit</td><td style="color:var(--accent)">■ Standard</td></tr>
+      <tr><td>Primer Storage</td><td>1.4S</td><td>Per magazine rating</td><td>2</td><td style="color:var(--yellow)">■ Caution</td></tr>
+      <tr><td>Propellant Loading</td><td>1.3C</td><td>10 kg</td><td>4</td><td style="color:var(--yellow)">■ Caution</td></tr>
+      <tr><td>Comp A5 Storage</td><td>1.1D</td><td>Per Q-D tables</td><td>2</td><td style="color:var(--red)">■ Critical</td></tr>
+      <tr><td>Explosive Pressing</td><td>1.1D</td><td>5 kg operational</td><td>3</td><td style="color:var(--red)">■ Critical</td></tr>
+      <tr><td>Fuze Installation</td><td>1.4S</td><td>Based on round count</td><td>4</td><td style="color:var(--yellow)">■ Caution</td></tr>
+      <tr><td>Function Testing</td><td>1.1D</td><td>Per test plan</td><td>As approved</td><td style="color:var(--red)">■ Critical</td></tr>
+      <tr><td>Final Assembly (post-fuze)</td><td>1.4S</td><td>Per building rating</td><td>8</td><td style="color:var(--yellow)">■ Caution</td></tr>
+      <tr><td>Packaging</td><td>1.4S</td><td>Per building rating</td><td>No limit</td><td style="color:var(--accent)">■ Standard</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:2rem;margin-bottom:1rem">PPE Matrix by Station</h3>
+  <table>
+    <thead><tr><th>Station</th><th>Safety Glasses</th><th>Face Shield</th><th>Hearing</th><th>Anti-Static Smock</th><th>Conductive Shoes</th><th>Nitrile Gloves</th><th>Hard Hat</th></tr></thead>
+    <tbody>
+      <tr><td>Receiving</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Case Prep</td><td>✅</td><td>—</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Primer Install</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+      <tr><td>Propellant Load</td><td>✅</td><td>✅</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+      <tr><td>Explosive Press</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+      <tr><td>Fuze Install</td><td>✅</td><td>✅</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+      <tr><td>Function Test Range</td><td>✅</td><td>✅</td><td>✅ (double)</td><td>—</td><td>—</td><td>—</td><td>✅</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:2rem;margin-bottom:1rem">Emergency Response Procedures</h3>
+  <div class="accordion" data-acc>
+    <div class="accordion-header" onclick="toggleAcc(this)"><span class="chevron">▶</span><h4>🔥 Fire in Production Area</h4><span class="badge badge-red">CRITICAL</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <ol style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li><strong style="color:var(--red)">EVACUATE IMMEDIATELY</strong> — Do not attempt to fight an explosive fire</li>
+        <li>Sound fire alarm (pull station at each exit)</li>
+        <li>Evacuate to designated assembly point (minimum 300m from explosive buildings)</li>
+        <li>Account for all personnel (buddy system roster)</li>
+        <li>Call 911, then notify on-site Safety Officer</li>
+        <li>Brief responding fire department on explosive quantities and types present</li>
+        <li>Do NOT re-enter until "All Clear" from Safety Officer and fire department</li>
+        <li>If fire involves Class 1.1D — establish 600m evacuation radius</li>
+      </ol>
+    </div></div>
+  </div>
+  <div class="accordion" data-acc>
+    <div class="accordion-header" onclick="toggleAcc(this)"><span class="chevron">▶</span><h4>💥 Accidental Detonation</h4><span class="badge badge-red">CRITICAL</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <ol style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li>Take cover immediately if still in building</li>
+        <li>After initial event, evacuate to 600m assembly point</li>
+        <li>Render first aid to injured — do not move patients with suspected spinal injury</li>
+        <li>Call 911 — report explosion, estimated casualties, explosive type</li>
+        <li>Notify Safety Officer, Plant Manager, DCMA QAR</li>
+        <li>Preserve scene for investigation (do not clean up or move anything)</li>
+        <li>Notify DDESB within 24 hours per DoD 6055.09-M</li>
+        <li>Initiate Accident Investigation Board (AIB) per local procedures</li>
+      </ol>
+    </div></div>
+  </div>
+  <div class="accordion" data-acc>
+    <div class="accordion-header" onclick="toggleAcc(this)"><span class="chevron">▶</span><h4>🧪 Chemical Spill (Propellant/Solvent)</h4><span class="badge badge-yellow">CAUTION</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <ol style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li>Alert personnel in immediate area</li>
+        <li>If propellant spill: eliminate all ignition sources (shut down equipment)</li>
+        <li>Don appropriate PPE (nitrile gloves, face shield, respirator if vapor present)</li>
+        <li>Contain spill using absorbent material (vermiculite for propellant, spill pillows for solvents)</li>
+        <li>Do NOT sweep dry propellant — wet down first with water spray</li>
+        <li>Collect contaminated material in proper waste container</li>
+        <li>Notify Safety Officer and Environmental Manager</li>
+        <li>Document spill (quantity, time, location, response) per SPCC plan</li>
+      </ol>
+    </div></div>
+  </div>
+  <div class="accordion" data-acc>
+    <div class="accordion-header" onclick="toggleAcc(this)"><span class="chevron">▶</span><h4>🏥 Medical Emergency</h4><span class="badge badge-yellow">CAUTION</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <ol style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8">
+        <li>Call 911 / on-site medical</li>
+        <li>Begin first aid (CPR, bleeding control) — all production personnel trained in Stop-the-Bleed</li>
+        <li>If in explosive area: move patient only if area is safe; otherwise treat in place</li>
+        <li>AED locations: every production building entrance (checked monthly)</li>
+        <li>Trauma kit locations: every workstation (checked weekly)</li>
+        <li>Guide EMS to location — provide chemical exposure information from SDS binder</li>
+      </ol>
+    </div></div>
+  </div>
+
+  <h3 style="margin-top:2rem;margin-bottom:1rem">Quantity-Distance Reference</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7;margin-bottom:1rem">Minimum distances (in feet) from explosive locations to exposed sites, per DoD 6055.09-M Table 5-1 (above-ground, unbarricaded, HD 1.1):</p>
+    <table>
+      <thead><tr><th>NEW (lbs)</th><th>IBD (ft)</th><th>PTR (ft)</th><th>IMD (ft)</th></tr></thead>
+      <tbody>
+        <tr><td>10</td><td>200</td><td>126</td><td>60</td></tr>
+        <tr><td>50</td><td>328</td><td>206</td><td>98</td></tr>
+        <tr><td>100</td><td>414</td><td>260</td><td>124</td></tr>
+        <tr><td>500</td><td>676</td><td>426</td><td>202</td></tr>
+        <tr><td>1,000</td><td>852</td><td>538</td><td>254</td></tr>
+        <tr><td>5,000</td><td>1,394</td><td>878</td><td>416</td></tr>
+        <tr><td>10,000</td><td>1,756</td><td>1,108</td><td>524</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--text3);font-size:.8rem;margin-top:.5rem">IBD = Inhabited Building Distance | PTR = Public Traffic Route | IMD = Inter-Magazine Distance | NEW = Net Explosive Weight</p>
+  </div>
+
+  <h3 style="margin-top:2rem;margin-bottom:1rem">Environmental Controls</h3>
+  <div class="spec-grid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">
+    <div class="card" style="margin:0"><h4>Temperature</h4><p style="color:var(--text2);font-size:.85rem;margin-top:.3rem">All explosive operations: 15–30°C (59–86°F). Continuous monitoring with alarmed data loggers. HVAC dedicated to explosive areas — no recirculated air.</p></div>
+    <div class="card" style="margin:0"><h4>Humidity</h4><p style="color:var(--text2);font-size:.85rem;margin-top:.3rem">Propellant/explosive areas: 30–65% RH. Dehumidification required in humid climates. Propellant absorbs moisture → affects burn rate.</p></div>
+    <div class="card" style="margin:0"><h4>Static Control</h4><p style="color:var(--text2);font-size:.85rem;margin-top:.3rem">All explosive areas: conductive flooring, grounding straps, ionizers. Personnel ground before entering. Max surface resistance: 10⁶ Ω. ESD audits quarterly.</p></div>
+    <div class="card" style="margin:0"><h4>Lightning</h4><p style="color:var(--text2);font-size:.85rem;margin-top:.3rem">All explosive buildings: lightning protection per NFPA 780 + MIL-STD-1576. Operations suspended when lightning within 5 NM. Storm detection system required.</p></div>
+  </div>
+</div>
+
+<!-- =====================================================
+     SECTION 7: SUPPLY CHAIN
+     ===================================================== -->
+<div class="section" id="sec-supply">
+  <div class="section-header">
+    <div class="classification">CONTROLLED — ITAR RESTRICTED</div>
+    <h1>Supply Chain Reference</h1>
+    <p>Approved supplier management, sourcing strategy, inventory planning, and counterfeit prevention for M433A1 production.</p>
+  </div>
+
+  <h3 style="margin-bottom:1rem">Approved Supplier Matrix</h3>
+  <table>
+    <thead><tr><th>Component</th><th>Primary Source</th><th>Secondary Source</th><th>Lead Time</th><th>Min Order Qty</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>M118A1 Case</td><td>General Dynamics OTS</td><td>Amtec (Less Lethal)</td><td>16–20 weeks</td><td>50,000</td><td><span class="badge badge-green">Qualified</span></td></tr>
+      <tr><td>M42A1 Primer</td><td>Federal Primer (Vista)</td><td>CCI/Speer (Vista)</td><td>20–24 weeks</td><td>100,000</td><td><span class="badge badge-green">Qualified</span></td></tr>
+      <tr><td>M2 Propellant</td><td>General Dynamics OTS (St. Marks)</td><td>BAE Systems (Radford)</td><td>24–36 weeks</td><td>500 kg</td><td><span class="badge badge-green">Qualified</span></td></tr>
+      <tr><td>OFHC Copper Liner</td><td>Specialty Defense (custom)</td><td>In-house capability (target)</td><td>12–16 weeks</td><td>10,000</td><td><span class="badge badge-yellow">Qualifying</span></td></tr>
+      <tr><td>Comp A5 (RDX blend)</td><td>Dyno Nobel (Louisiana)</td><td>Chemring (UK — ITAR license)</td><td>16–24 weeks</td><td>100 kg</td><td><span class="badge badge-green">Qualified</span></td></tr>
+      <tr><td>Frag Body (1045 steel)</td><td>American Ordnance (Iowa AAP)</td><td>Day & Zimmermann</td><td>12–16 weeks</td><td>25,000</td><td><span class="badge badge-green">Qualified</span></td></tr>
+      <tr><td>Tungsten Spheres</td><td>Kennametal (PA)</td><td>Wolfram Bergbau (Austria — ITAR)</td><td>8–12 weeks</td><td>5 kg</td><td><span class="badge badge-green">Qualified</span></td></tr>
+      <tr><td>Ogive (molded)</td><td>In-house injection molding</td><td>—</td><td>As-needed</td><td>N/A</td><td><span class="badge badge-blue">Internal</span></td></tr>
+      <tr><td>M550A1 Fuze</td><td>L3Harris (Fuze Division)</td><td>Orbital ATK (Northrop)</td><td>24–36 weeks</td><td>10,000</td><td><span class="badge badge-green">Qualified</span></td></tr>
+      <tr><td>Rotating Band (Cu)</td><td>Materion (Elmore, OH)</td><td>PMX Industries</td><td>6–8 weeks</td><td>25,000</td><td><span class="badge badge-green">Qualified</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:2rem;margin-bottom:1rem">Safety Stock Calculations</h3>
+  <div class="card">
+    <p style="color:var(--text2);font-size:.9rem;line-height:1.7;margin-bottom:1rem">Safety stock = Z × σ_LT, where Z = service level factor (2.33 for 99%), σ_LT = std deviation of demand during lead time.</p>
+    <table>
+      <thead><tr><th>Component</th><th>Lead Time</th><th>Monthly Usage (10K/mo)</th><th>Safety Stock</th><th>Reorder Point</th></tr></thead>
+      <tbody>
+        <tr><td>M118A1 Case</td><td>18 wk (4.5 mo)</td><td>10,000</td><td>15,000</td><td>60,000</td></tr>
+        <tr><td>M42A1 Primer</td><td>22 wk (5.5 mo)</td><td>10,000</td><td>18,000</td><td>73,000</td></tr>
+        <tr><td>M2 Propellant</td><td>30 wk (7.5 mo)</td><td>42 kg</td><td>70 kg</td><td>385 kg</td></tr>
+        <tr><td>Comp A5</td><td>20 wk (5.0 mo)</td><td>390 kg</td><td>300 kg</td><td>2,250 kg</td></tr>
+        <tr><td>M550A1 Fuze</td><td>30 wk (7.5 mo)</td><td>10,000</td><td>20,000</td><td>95,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:2rem;margin-bottom:1rem">Supplier Audit Checklist</h3>
+  <div class="card">
+    <ul style="padding-left:1.25rem;color:var(--text2);font-size:.9rem;line-height:1.8;column-count:2;column-gap:2rem">
+      <li>Quality management system certification (ISO 9001/AS9100)</li>
+      <li>ITAR compliance (DDTC registration, TCP)</li>
+      <li>Process capability data (Cpk for critical dimensions)</li>
+      <li>Calibration system (ISO 17025 traceable)</li>
+      <li>Material traceability (heat/lot tracking)</li>
+      <li>Subcontractor control program</li>
+      <li>Nonconformance and CAPA procedures</li>
+      <li>Document and record control</li>
+      <li>Training records and competency verification</li>
+      <li>Counterfeit parts prevention program</li>
+      <li>ESD and FOD control (where applicable)</li>
+      <li>Packaging and preservation per contract</li>
+      <li>On-time delivery performance (target ≥95%)</li>
+      <li>Customer complaint history</li>
+      <li>Business continuity / disaster recovery plan</li>
+      <li>Financial stability assessment</li>
+    </ul>
+  </div>
+
+  <h3 style="margin-top:2rem;margin-bottom:1rem">Shelf Life Management</h3>
+  <table>
+    <thead><tr><th>Material</th><th>Type</th><th>Shelf Life</th><th>Extension Criteria</th></tr></thead>
+    <tbody>
+      <tr><td>M42A1 Primer</td><td>Type II (extendable)</td><td>10 years initial</td><td>Surveillance test: sensitivity, function</td></tr>
+      <tr><td>M2 Propellant</td><td>Type II</td><td>20 years (conditioned)</td><td>Stability test (Taliani) every 5 years</td></tr>
+      <tr><td>Comp A5</td><td>Type I (non-extendable)</td><td>20 years</td><td>N/A — demil at expiry</td></tr>
+      <tr><td>Complete M433A1</td><td>Type II</td><td>20 years (conditioned)</td><td>Surveillance per SB 742-1</td></tr>
+      <tr><td>O-rings / Sealants</td><td>Type I</td><td>5 years</td><td>Replace — do not extend</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- =====================================================
+     SECTION 8: CALCULATORS
+     ===================================================== -->
+<div class="section" id="sec-calculators">
+  <div class="section-header">
+    <h1>Production Calculators</h1>
+    <p>Interactive tools for production planning, cost analysis, and performance metrics.</p>
+  </div>
+
+  <div class="tabs" id="calcTabs">
+    <button class="tab-btn active" data-tab="calc-rate">Rate Calculator</button>
+    <button class="tab-btn" data-tab="calc-bom">BOM Cost</button>
+    <button class="tab-btn" data-tab="calc-oee">OEE</button>
+    <button class="tab-btn" data-tab="calc-capacity">Capacity</button>
+    <button class="tab-btn" data-tab="calc-breakeven">Break-Even</button>
+    <button class="tab-btn" data-tab="calc-lotsize">Lot Size</button>
+  </div>
+
+  <!-- Rate Calculator -->
+  <div class="tab-content active" id="tc-calc-rate">
+    <div class="calc-grid">
+      <div class="card">
+        <h4 style="margin-bottom:1rem">Production Rate Calculator</h4>
+        <div class="calc-input-group"><label>Order Quantity (rounds)</label><input type="number" id="rc-qty" value="50000"></div>
+        <div class="calc-input-group"><label>Shifts per Day</label><select id="rc-shifts"><option value="1">1 Shift (8hr)</option><option value="2" selected>2 Shifts (16hr)</option><option value="3">3 Shifts (24hr)</option></select></div>
+        <div class="calc-input-group"><label>Production Lines</label><input type="number" id="rc-lines" value="2" min="1" max="10"></div>
+        <div class="calc-input-group"><label>Rate per Line per Shift (rds)</label><input type="number" id="rc-rate" value="500"></div>
+        <div class="calc-input-group"><label>Unit Sell Price ($)</label><input type="number" id="rc-price" value="45" step="0.01"></div>
+        <div class="calc-input-group"><label>Unit COGS ($)</label><input type="number" id="rc-cogs" value="28" step="0.01"></div>
+        <button class="btn btn-primary" onclick="calcRate()" style="width:100%;margin-top:.5rem">Calculate</button>
+      </div>
+      <div>
+        <div class="calc-result" style="margin-bottom:1rem"><div class="result-label">Days to Complete</div><div class="result-value" id="rc-days">25</div></div>
+        <div class="calc-result" style="margin-bottom:1rem"><div class="result-label">Revenue</div><div class="result-value" id="rc-revenue">$2,250,000</div></div>
+        <div class="calc-result" style="margin-bottom:1rem"><div class="result-label">COGS</div><div class="result-value" id="rc-totalcogs">$1,400,000</div></div>
+        <div class="calc-result"><div class="result-label">Gross Profit</div><div class="result-value" id="rc-profit">$850,000</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOM Cost -->
+  <div class="tab-content" id="tc-calc-bom">
+    <div class="card">
+      <h4 style="margin-bottom:1rem">Bill of Materials Cost Calculator</h4>
+      <p style="color:var(--text2);font-size:.85rem;margin-bottom:1rem">Adjust component prices to see impact on unit cost. All prices per unit.</p>
+      <table id="bom-table">
+        <thead><tr><th>Component</th><th>Unit Cost ($)</th><th>Qty/Round</th><th>Extended ($)</th></tr></thead>
+        <tbody>
+          <tr><td>M118A1 Case</td><td><input type="number" class="bom-cost" value="3.50" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">3.50</td></tr>
+          <tr><td>M42A1 Primer</td><td><input type="number" class="bom-cost" value="0.35" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">0.35</td></tr>
+          <tr><td>M2 Propellant (4.2g)</td><td><input type="number" class="bom-cost" value="0.45" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">0.45</td></tr>
+          <tr><td>Copper Liner</td><td><input type="number" class="bom-cost" value="2.80" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">2.80</td></tr>
+          <tr><td>Comp A5 (39g)</td><td><input type="number" class="bom-cost" value="4.20" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">4.20</td></tr>
+          <tr><td>Frag Body</td><td><input type="number" class="bom-cost" value="3.00" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">3.00</td></tr>
+          <tr><td>Tungsten Spheres</td><td><input type="number" class="bom-cost" value="4.50" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">4.50</td></tr>
+          <tr><td>Plastic Ogive</td><td><input type="number" class="bom-cost" value="1.20" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">1.20</td></tr>
+          <tr><td>M550A1 Fuze</td><td><input type="number" class="bom-cost" value="6.00" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">6.00</td></tr>
+          <tr><td>Rotating Band</td><td><input type="number" class="bom-cost" value="0.40" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">0.40</td></tr>
+          <tr><td>Labor (assembly)</td><td><input type="number" class="bom-cost" value="1.50" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">1.50</td></tr>
+          <tr><td>Packaging</td><td><input type="number" class="bom-cost" value="0.35" step="0.01" style="width:80px"></td><td>1</td><td class="bom-ext">0.35</td></tr>
+        </tbody>
+      </table>
+      <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap">
+        <div class="calc-result" style="flex:1;min-width:200px"><div class="result-label">Unit COGS</div><div class="result-value" id="bom-total">$28.25</div></div>
+        <div class="calc-result" style="flex:1;min-width:200px"><div class="result-label">Sell @ $45 → Margin</div><div class="result-value" id="bom-margin">37.2%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OEE Calculator -->
+  <div class="tab-content" id="tc-calc-oee">
+    <div class="calc-grid">
+      <div class="card">
+        <h4 style="margin-bottom:1rem">OEE Calculator</h4>
+        <div class="calc-input-group"><label>Availability (%) — uptime vs. planned time</label><input type="number" id="oee-avail" value="92" min="0" max="100"></div>
+        <div class="calc-input-group"><label>Performance (%) — actual rate vs. ideal rate</label><input type="number" id="oee-perf" value="88" min="0" max="100"></div>
+        <div class="calc-input-group"><label>Quality (%) — good units vs. total units</label><input type="number" id="oee-qual" value="97" min="0" max="100"></div>
+        <button class="btn btn-primary" onclick="calcOEE()" style="width:100%;margin-top:.5rem">Calculate OEE</button>
+      </div>
+      <div>
+        <div class="calc-result" style="margin-bottom:1rem">
+          <div class="result-label">OEE Score</div>
+          <div class="result-value" id="oee-score">78.5%</div>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom:.5rem">OEE Benchmarks</h4>
+          <table>
+            <tbody>
+              <tr><td style="color:var(--red)">≤40%</td><td>Unacceptable — major losses</td></tr>
+              <tr><td style="color:var(--yellow)">40–65%</td><td>Typical (unmanaged)</td></tr>
+              <tr><td style="color:var(--blue)">65–85%</td><td>Good — competitive</td></tr>
+              <tr><td style="color:var(--accent)">≥85%</td><td>World Class</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Capacity Planner -->
+  <div class="tab-content" id="tc-calc-capacity">
+    <div class="calc-grid">
+      <div class="card">
+        <h4 style="margin-bottom:1rem">Capacity Planner</h4>
+        <div class="calc-input-group"><label>Production Lines</label><input type="number" id="cap-lines" value="2" min="1"></div>
+        <div class="calc-input-group"><label>Shifts per Day</label><select id="cap-shifts"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></div>
+        <div class="calc-input-group"><label>Rate per Line/Shift</label><input type="number" id="cap-rate" value="500"></div>
+        <div class="calc-input-group"><label>Working Days per Month</label><input type="number" id="cap-days" value="22"></div>
+        <div class="calc-input-group"><label>OEE (%)</label><input type="number" id="cap-oee" value="78" min="0" max="100"></div>
+        <button class="btn btn-primary" onclick="calcCapacity()" style="width:100%;margin-top:.5rem">Calculate</button>
+      </div>
+      <div>
+        <div class="calc-result" style="margin-bottom:1rem"><div class="result-label">Monthly Capacity (Theoretical)</div><div class="result-value" id="cap-theo">44,000</div></div>
+        <div class="calc-result" style="margin-bottom:1rem"><div class="result-label">Monthly Capacity (Effective @ OEE)</div><div class="result-value" id="cap-eff">34,320</div></div>
+        <div class="calc-result"><div class="result-label">Annual Capacity (Effective)</div><div class="result-value" id="cap-annual">411,840</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Break-Even -->
+  <div class="tab-content" id="tc-calc-breakeven">
+    <div class="calc-grid">
+      <div class="card">
+        <h4 style="margin-bottom:1rem">Break-Even Calculator</h4>
+        <div class="calc-input-group"><label>Fixed Costs / Month ($)</label><input type="number" id="be-fixed" value="250000"></div>
+        <div class="calc-input-group"><label>Variable Cost / Unit ($)</label><input type="number" id="be-var" value="28" step="0.01"></div>
+        <div class="calc-input-group"><label>Sell Price / Unit ($)</label><input type="number" id="be-price" value="45" step="0.01"></div>
+        <button class="btn btn-primary" onclick="calcBreakEven()" style="width:100%;margin-top:.5rem">Calculate</button>
+      </div>
+      <div>
+        <div class="calc-result" style="margin-bottom:1rem"><div class="result-label">Break-Even Volume (Monthly)</div><div class="result-value" id="be-vol">14,706</div></div>
+        <div class="calc-result" style="margin-bottom:1rem"><div class="result-label">Contribution Margin / Unit</div><div class="result-value" id="be-cm">$17.00</div></div>
+        <div class="calc-result"><div class="result-label">CM Ratio</div><div class="result-value" id="be-cmr">37.8%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lot Size Optimizer -->
+  <div class="tab-content" id="tc-calc-lotsize">
+    <div class="calc-grid">
+      <div class="card">
+        <h4 style="margin-bottom:1rem">Economic Lot Size (EOQ) Optimizer</h4>
+        <div class="calc-input-group"><label>Annual Demand (rounds)</label><input type="number" id="ls-demand" value="200000"></div>
+        <div class="calc-input-group"><label>Setup Cost per Lot ($)</label><input type="number" id="ls-setup" value="5000"></div>
+        <div class="calc-input-group"><label>Holding Cost per Unit/Year ($)</label><input type="number" id="ls-hold" value="3.50" step="0.01"></div>
+        <button class="btn btn-primary" onclick="calcLotSize()" style="width:100%;margin-top:.5rem">Calculate</button>
+      </div>
+      <div>
+        <div class="calc-result" style="margin-bottom:1rem"><div class="result-label">Economic Order Quantity</div><div class="result-value" id="ls-eoq">23,905</div></div>
+        <div class="calc-result" style="margin-bottom:1rem"><div class="result-label">Number of Lots per Year</div><div class="result-value" id="ls-lots">8.4</div></div>
+        <div class="calc-result"><div class="result-label">Total Annual Cost (setup + holding)</div><div class="result-value" id="ls-cost">$83,666</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     SECTION 9: GLOSSARY & REFERENCE
+     ===================================================== -->
+<div class="section" id="sec-glossary">
+  <div class="section-header">
+    <h1>Glossary & Reference</h1>
+    <p>Military specifications, acronyms, unit conversions, and quick reference for ordnance manufacturing professionals.</p>
+  </div>
+
+  <div class="tabs" id="glossTabs">
+    <button class="tab-btn active" data-tab="gloss-specs">MIL-SPECs</button>
+    <button class="tab-btn" data-tab="gloss-acronyms">Acronyms</button>
+    <button class="tab-btn" data-tab="gloss-convert">Conversions</button>
+  </div>
+
+  <!-- MIL-SPECs -->
+  <div class="tab-content active" id="tc-gloss-specs">
+    <h3 style="margin-bottom:1rem">Military Specification Reference</h3>
+    <table>
+      <thead><tr><th>Specification</th><th>Title</th><th>Application</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--accent)">MIL-DTL-45588</td><td>Cartridge Cases, Small Arms</td><td>M118A1 case requirements</td></tr>
+        <tr><td style="color:var(--accent)">MIL-DTL-398</td><td>RDX (Cyclotrimethylenetrinitramine)</td><td>Comp A5 RDX specification</td></tr>
+        <tr><td style="color:var(--accent)">MIL-STD-1916</td><td>DoD Test Method: Acceptance Sampling</td><td>Sampling plans for all inspections</td></tr>
+        <tr><td style="color:var(--accent)">MIL-STD-331</td><td>Fuze and Fuze Components, Environmental Testing</td><td>Fuze and round environmental quals</td></tr>
+        <tr><td style="color:var(--accent)">MIL-STD-2105</td><td>Hazard Assessment Tests for Non-Nuclear Munitions</td><td>Safety testing of complete rounds</td></tr>
+        <tr><td style="color:var(--accent)">MIL-STD-810</td><td>Environmental Engineering Considerations</td><td>Environmental testing methods</td></tr>
+        <tr><td style="color:var(--accent)">MIL-STD-1751</td><td>Safety and Performance Tests for Energetic Materials</td><td>Explosive sensitivity testing</td></tr>
+        <tr><td style="color:var(--accent)">MIL-A-8625</td><td>Anodic Coatings for Aluminum</td><td>M118A1 case anodize</td></tr>
+        <tr><td style="color:var(--accent)">MIL-DTL-16232</td><td>Phosphate Coating, Heavy, Manganese or Zinc</td><td>Frag body surface treatment</td></tr>
+        <tr><td style="color:var(--accent)">MIL-STD-2073</td><td>Standard Practice for Military Packaging</td><td>Ammunition packaging requirements</td></tr>
+        <tr><td style="color:var(--accent)">MIL-PRF-28776</td><td>O-Rings, Elastomeric</td><td>Fuze seal</td></tr>
+        <tr><td style="color:var(--accent)">MIL-STD-1576</td><td>Electroexplosive Subsystem Safety Requirements</td><td>Lightning protection for explosive areas</td></tr>
+        <tr><td style="color:var(--accent)">DoD 6055.09-M</td><td>DoD Ammunition and Explosives Safety Standards</td><td>Q-D, site planning, operations safety</td></tr>
+        <tr><td style="color:var(--accent)">DoD 4145.26-M</td><td>Contractors' Safety Manual for Ammo & Explosives</td><td>Production safety requirements</td></tr>
+        <tr><td style="color:var(--accent)">TB 700-2</td><td>Dept of Defense Explosives Hazard Classification</td><td>Hazard classification procedures</td></tr>
+        <tr><td style="color:var(--accent)">SB 742-1</td><td>Ammunition Surveillance Procedures</td><td>Stockpile surveillance testing</td></tr>
+        <tr><td style="color:var(--accent)">AS9100</td><td>Quality Management Systems — Aerospace</td><td>QMS certification requirement</td></tr>
+        <tr><td style="color:var(--accent)">AS9102</td><td>First Article Inspection Requirement</td><td>FAI procedures and forms</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Acronyms -->
+  <div class="tab-content" id="tc-gloss-acronyms">
+    <h3 style="margin-bottom:1rem">Acronym Glossary</h3>
+    <input type="text" id="acronymSearch" placeholder="Filter acronyms..." style="width:100%;max-width:400px;margin-bottom:1rem">
+    <div class="glossary-grid" id="acronymGrid">
+      <div class="glossary-item"><span class="g-term">AAP</span> — Army Ammunition Plant</div>
+      <div class="glossary-item"><span class="g-term">AED</span> — Automated External Defibrillator</div>
+      <div class="glossary-item"><span class="g-term">AIB</span> — Accident Investigation Board</div>
+      <div class="glossary-item"><span class="g-term">AQL</span> — Acceptable Quality Level</div>
+      <div class="glossary-item"><span class="g-term">ARDEC</span> — Armament Research Development Engineering Center</div>
+      <div class="glossary-item"><span class="g-term">ATF</span> — Bureau of Alcohol, Tobacco, Firearms and Explosives</div>
+      <div class="glossary-item"><span class="g-term">BAM</span> — Bundesanstalt für Materialforschung (German sensitivity test)</div>
+      <div class="glossary-item"><span class="g-term">BOM</span> — Bill of Materials</div>
+      <div class="glossary-item"><span class="g-term">CAGE</span> — Commercial and Government Entity</div>
+      <div class="glossary-item"><span class="g-term">CAPA</span> — Corrective and Preventive Action</div>
+      <div class="glossary-item"><span class="g-term">CD</span> — Charge Diameter (shaped charge)</div>
+      <div class="glossary-item"><span class="g-term">CG</span> — Compatibility Group (explosives)</div>
+      <div class="glossary-item"><span class="g-term">CMM</span> — Coordinate Measuring Machine</div>
+      <div class="glossary-item"><span class="g-term">CNC</span> — Computer Numerical Control</div>
+      <div class="glossary-item"><span class="g-term">COGS</span> — Cost of Goods Sold</div>
+      <div class="glossary-item"><span class="g-term">CoC</span> — Certificate of Conformance</div>
+      <div class="glossary-item"><span class="g-term">Cpk</span> — Process Capability Index</div>
+      <div class="glossary-item"><span class="g-term">DAR</span> — Defense Acquisition Regulation</div>
+      <div class="glossary-item"><span class="g-term">DCMA</span> — Defense Contract Management Agency</div>
+      <div class="glossary-item"><span class="g-term">DDESB</span> — DoD Explosives Safety Board</div>
+      <div class="glossary-item"><span class="g-term">DDTC</span> — Directorate of Defense Trade Controls</div>
+      <div class="glossary-item"><span class="g-term">DEVCOM AC</span> — DEVCOM Armaments Center (fmr ARDEC)</div>
+      <div class="glossary-item"><span class="g-term">DFARS</span> — Defense Federal Acquisition Regulation Supplement</div>
+      <div class="glossary-item"><span class="g-term">DLA</span> — Defense Logistics Agency</div>
+      <div class="glossary-item"><span class="g-term">DoD</span> — Department of Defense</div>
+      <div class="glossary-item"><span class="g-term">DOT</span> — Department of Transportation</div>
+      <div class="glossary-item"><span class="g-term">DSP-5</span> — Permanent Export License (ITAR)</div>
+      <div class="glossary-item"><span class="g-term">DSP-73</span> — Temporary Export License (ITAR)</div>
+      <div class="glossary-item"><span class="g-term">DSP-85</span> — Temporary Import License (ITAR)</div>
+      <div class="glossary-item"><span class="g-term">DSS</span> — Defense Security Service</div>
+      <div class="glossary-item"><span class="g-term">ECP</span> — Engineering Change Proposal</div>
+      <div class="glossary-item"><span class="g-term">EDM</span> — Electrical Discharge Machining</div>
+      <div class="glossary-item"><span class="g-term">EO</span> — Empowered Official (ITAR)</div>
+      <div class="glossary-item"><span class="g-term">EOQ</span> — Economic Order Quantity</div>
+      <div class="glossary-item"><span class="g-term">ESD</span> — Electrostatic Discharge</div>
+      <div class="glossary-item"><span class="g-term">ETP</span> — Electrolytic Tough Pitch (copper)</div>
+      <div class="glossary-item"><span class="g-term">FAI</span> — First Article Inspection</div>
+      <div class="glossary-item"><span class="g-term">FAT</span> — First Article Test</div>
+      <div class="glossary-item"><span class="g-term">FEL</span> — Federal Explosives License</div>
+      <div class="glossary-item"><span class="g-term">FFL</span> — Federal Firearms License</div>
+      <div class="glossary-item"><span class="g-term">FIFO</span> — First In, First Out</div>
+      <div class="glossary-item"><span class="g-term">FOD</span> — Foreign Object Debris/Damage</div>
+      <div class="glossary-item"><span class="g-term">GR&R</span> — Gauge Repeatability & Reproducibility</div>
+      <div class="glossary-item"><span class="g-term">HD</span> — Hazard Division (explosives classification)</div>
+      <div class="glossary-item"><span class="g-term">HE</span> — High Explosive</div>
+      <div class="glossary-item"><span class="g-term">HEDP</span> — High Explosive Dual Purpose</div>
+      <div class="glossary-item"><span class="g-term">HRC</span> — Hardness Rockwell C-scale</div>
+      <div class="glossary-item"><span class="g-term">HV</span> — Hardness Vickers</div>
+      <div class="glossary-item"><span class="g-term">HVAC</span> — Heating, Ventilation, Air Conditioning</div>
+      <div class="glossary-item"><span class="g-term">IBD</span> — Inhabited Building Distance</div>
+      <div class="glossary-item"><span class="g-term">IMD</span> — Inter-Magazine Distance</div>
+      <div class="glossary-item"><span class="g-term">ITAR</span> — International Traffic in Arms Regulations</div>
+      <div class="glossary-item"><span class="g-term">JMC</span> — Joint Munitions Command</div>
+      <div class="glossary-item"><span class="g-term">LAT</span> — Lot Acceptance Testing</div>
+      <div class="glossary-item"><span class="g-term">LV</span> — Low Velocity (40×46mm system)</div>
+      <div class="glossary-item"><span class="g-term">MAP</span> — Maximum Average Pressure</div>
+      <div class="glossary-item"><span class="g-term">MCE</span> — Maximum Credible Event</div>
+      <div class="glossary-item"><span class="g-term">MLA</span> — Manufacturing License Agreement</div>
+      <div class="glossary-item"><span class="g-term">MRB</span> — Material Review Board</div>
+      <div class="glossary-item"><span class="g-term">MSDS</span> — Material Safety Data Sheet</div>
+      <div class="glossary-item"><span class="g-term">NC</span> — Nitrocellulose</div>
+      <div class="glossary-item"><span class="g-term">NCR</span> — Non-Conformance Report</div>
+      <div class="glossary-item"><span class="g-term">NDT</span> — Non-Destructive Testing</div>
+      <div class="glossary-item"><span class="g-term">NEW</span> — Net Explosive Weight</div>
+      <div class="glossary-item"><span class="g-term">NFPA</span> — National Fire Protection Association</div>
+      <div class="glossary-item"><span class="g-term">OEE</span> — Overall Equipment Effectiveness</div>
+      <div class="glossary-item"><span class="g-term">OEF</span> — Operation Enduring Freedom</div>
+      <div class="glossary-item"><span class="g-term">OFHC</span> — Oxygen-Free High Conductivity (copper)</div>
+      <div class="glossary-item"><span class="g-term">OIF</span> — Operation Iraqi Freedom</div>
+      <div class="glossary-item"><span class="g-term">OOL</span> — Out-of-Line (fuze safety)</div>
+      <div class="glossary-item"><span class="g-term">PD</span> — Point Detonating</div>
+      <div class="glossary-item"><span class="g-term">PETN</span> — Pentaerythritol Tetranitrate</div>
+      <div class="glossary-item"><span class="g-term">PM-MAS</span> — Project Manager, Maneuver Ammunition Systems</div>
+      <div class="glossary-item"><span class="g-term">PPE</span> — Personal Protective Equipment</div>
+      <div class="glossary-item"><span class="g-term">PPM</span> — Parts Per Million</div>
+      <div class="glossary-item"><span class="g-term">PTR</span> — Public Traffic Route</div>
+      <div class="glossary-item"><span class="g-term">Q-D</span> — Quantity-Distance</div>
+      <div class="glossary-item"><span class="g-term">QA</span> — Quality Assurance</div>
+      <div class="glossary-item"><span class="g-term">QAR</span> — Quality Assurance Representative</div>
+      <div class="glossary-item"><span class="g-term">QC</span> — Quality Control</div>
+      <div class="glossary-item"><span class="g-term">RDX</span> — Cyclotrimethylenetrinitramine (Royal Demolition Explosive)</div>
+      <div class="glossary-item"><span class="g-term">RFP</span> — Request for Proposal</div>
+      <div class="glossary-item"><span class="g-term">RH</span> — Relative Humidity</div>
+      <div class="glossary-item"><span class="g-term">RHA</span> — Rolled Homogeneous Armor</div>
+      <div class="glossary-item"><span class="g-term">SAM</span> — System for Award Management</div>
+      <div class="glossary-item"><span class="g-term">SDS</span> — Safety Data Sheet</div>
+      <div class="glossary-item"><span class="g-term">SOF</span> — Special Operations Forces</div>
+      <div class="glossary-item"><span class="g-term">SPC</span> — Statistical Process Control</div>
+      <div class="glossary-item"><span class="g-term">SPCC</span> — Spill Prevention, Control and Countermeasure</div>
+      <div class="glossary-item"><span class="g-term">SQ</span> — Superquick (fuze function)</div>
+      <div class="glossary-item"><span class="g-term">STANAG</span> — Standardization Agreement (NATO)</div>
+      <div class="glossary-item"><span class="g-term">TAA</span> — Technical Assistance Agreement</div>
+      <div class="glossary-item"><span class="g-term">TCP</span> — Technology Control Plan</div>
+      <div class="glossary-item"><span class="g-term">TDP</span> — Technical Data Package</div>
+      <div class="glossary-item"><span class="g-term">TIR</span> — Total Indicator Reading (runout)</div>
+      <div class="glossary-item"><span class="g-term">TMD</span> — Theoretical Maximum Density</div>
+      <div class="glossary-item"><span class="g-term">USML</span> — U.S. Munitions List</div>
+      <div class="glossary-item"><span class="g-term">VL</span> — Verification Level (MIL-STD-1916)</div>
+    </div>
+  </div>
+
+  <!-- Conversions -->
+  <div class="tab-content" id="tc-gloss-convert">
+    <h3 style="margin-bottom:1rem">Unit Conversion Tools</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem">
+      <!-- Weight -->
+      <div class="card">
+        <h4 style="margin-bottom:.75rem">Weight / Mass</h4>
+        <div class="calc-input-group"><label>Value</label><input type="number" id="conv-wt-val" value="1" step="any"></div>
+        <div class="calc-input-group"><label>From</label>
+          <select id="conv-wt-from"><option value="g">Grams</option><option value="kg">Kilograms</option><option value="oz">Ounces</option><option value="lb">Pounds</option><option value="gr">Grains</option></select>
+        </div>
+        <button class="btn btn-primary" onclick="convertWeight()" style="width:100%;margin-top:.5rem">Convert</button>
+        <div id="conv-wt-result" style="margin-top:.75rem;font-size:.9rem;color:var(--text2);line-height:1.8"></div>
+      </div>
+      <!-- Temperature -->
+      <div class="card">
+        <h4 style="margin-bottom:.75rem">Temperature</h4>
+        <div class="calc-input-group"><label>Value</label><input type="number" id="conv-temp-val" value="21" step="any"></div>
+        <div class="calc-input-group"><label>From</label>
+          <select id="conv-temp-from"><option value="C">Celsius</option><option value="F">Fahrenheit</option><option value="K">Kelvin</option></select>
+        </div>
+        <button class="btn btn-primary" onclick="convertTemp()" style="width:100%;margin-top:.5rem">Convert</button>
+        <div id="conv-temp-result" style="margin-top:.75rem;font-size:.9rem;color:var(--text2);line-height:1.8"></div>
+      </div>
+      <!-- Pressure -->
+      <div class="card">
+        <h4 style="margin-bottom:.75rem">Pressure</h4>
+        <div class="calc-input-group"><label>Value</label><input type="number" id="conv-pres-val" value="3000" step="any"></div>
+        <div class="calc-input-group"><label>From</label>
+          <select id="conv-pres-from"><option value="psi">PSI</option><option value="bar">Bar</option><option value="mpa">MPa</option><option value="atm">Atmospheres</option></select>
+        </div>
+        <button class="btn btn-primary" onclick="convertPressure()" style="width:100%;margin-top:.5rem">Convert</button>
+        <div id="conv-pres-result" style="margin-top:.75rem;font-size:.9rem;color:var(--text2);line-height:1.8"></div>
+      </div>
+      <!-- Length -->
+      <div class="card">
+        <h4 style="margin-bottom:.75rem">Length</h4>
+        <div class="calc-input-group"><label>Value</label><input type="number" id="conv-len-val" value="40" step="any"></div>
+        <div class="calc-input-group"><label>From</label>
+          <select id="conv-len-from"><option value="mm">Millimeters</option><option value="cm">Centimeters</option><option value="m">Meters</option><option value="in">Inches</option><option value="ft">Feet</option></select>
+        </div>
+        <button class="btn btn-primary" onclick="convertLength()" style="width:100%;margin-top:.5rem">Convert</button>
+        <div id="conv-len-result" style="margin-top:.75rem;font-size:.9rem;color:var(--text2);line-height:1.8"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- Back to top -->
+<div id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+// ===== Navigation =====
+const navItems = document.querySelectorAll('.nav-item[data-section]');
+const sections = document.querySelectorAll('.section');
+const bcCurrent = document.getElementById('bc-current');
+
+function navigateTo(sectionId, label) {
+  sections.forEach(s => s.classList.remove('active'));
+  navItems.forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById('sec-' + sectionId);
+  if (sec) {
+    sec.classList.add('active');
+    document.querySelectorAll(`.nav-item[data-section="${sectionId}"]`).forEach(n => n.classList.add('active'));
+    bcCurrent.textContent = label || sectionId;
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    // Close mobile sidebar
+    document.getElementById('sidebar').classList.remove('open');
+  }
+}
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    navigateTo(item.dataset.section, item.dataset.label);
+  });
+});
+
+// ===== Tabs =====
+document.querySelectorAll('.tabs').forEach(tabBar => {
+  tabBar.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tabId = btn.dataset.tab;
+      // Find sibling tab-contents
+      let container = tabBar.parentElement;
+      container.querySelectorAll('.tab-content').forEach(tc => {
+        tc.classList.remove('active');
+        if (tc.id === 'tc-' + tabId) tc.classList.add('active');
+      });
+    });
+  });
+});
+
+// ===== Accordion =====
+function toggleAcc(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// ===== SVG Component Click =====
+const compData = {
+  case: { section: 'comp-case', label: 'M118A1 Cartridge Case' },
+  primer: { section: 'comp-primer', label: 'M42A1 Primer' },
+  propellant: { section: 'comp-propellant', label: 'M2 Propellant' },
+  liner: { section: 'comp-liner', label: 'Shaped Charge Liner' },
+  explosive: { section: 'comp-explosive', label: 'Comp A5 Explosive' },
+  fragbody: { section: 'comp-fragbody', label: 'Frag Body' },
+  tungsten: { section: 'comp-tungsten', label: 'Tungsten Matrix' },
+  ogive: { section: 'comp-ogive', label: 'Plastic Ogive' },
+  fuze: { section: 'comp-fuze', label: 'M550A1 Fuze' },
+  band: { section: 'comp-band', label: 'Rotating Band' }
+};
+
+document.querySelectorAll('.svg-component').forEach(comp => {
+  comp.addEventListener('click', () => {
+    const key = comp.dataset.comp;
+    if (compData[key]) navigateTo(compData[key].section, compData[key].label);
+  });
+  comp.addEventListener('mouseenter', () => {
+    comp.style.filter = 'brightness(1.3) drop-shadow(0 0 8px rgba(0,255,136,.4))';
+  });
+  comp.addEventListener('mouseleave', () => {
+    comp.style.filter = '';
+  });
+});
+
+// ===== Assembly Process Flowchart =====
+const assemblySteps = [
+  { num: 1, title: 'Receiving Inspection', hazard: 'green', time: '15 min/lot', equipment: 'CMM, calipers, gauges, visual station',
+    instructions: 'Verify all incoming components against purchase order, CoC, and drawing requirements. Perform dimensional sampling per MIL-STD-1916 VL-IV. Check material certifications match specified alloys/grades. Log all incoming lots in ERP traceability system.',
+    tooling: 'Go/no-go gauge sets, ring gauges, plug gauges, depth micrometers, analytical balance',
+    safety: 'Safety glasses required. No explosive components at this station.',
+    gonogo: 'All sampled dimensions within drawing tolerance. CoC matches PO. Material certs verified against spec.',
+    defects: 'Dimensional out-of-spec → reject lot, issue supplier NCR. Missing documentation → hold until received. Mixed lots → quarantine and sort.' },
+  { num: 2, title: 'Cartridge Case Preparation', hazard: 'green', time: '0.5 min/unit', equipment: 'Ultrasonic cleaner, compressed air, inspection bench',
+    instructions: 'Clean cases in ultrasonic bath (aqueous degreaser, 40kHz, 5 min cycle). Blow dry with filtered compressed air. Inspect each case: visual check for dents, scratches, anodize defects. Gauge primer pocket depth and flash hole.',
+    tooling: 'Ultrasonic tank (20L min), air nozzle, depth gauge, pin gauge set',
+    safety: 'Safety glasses, hearing protection near ultrasonic equipment.',
+    gonogo: 'No visible defects, primer pocket depth 3.81mm ±0.05mm, flash hole clear, anodize intact.',
+    defects: 'Dented cases → scrap (aluminum work-hardens, cannot reform). Anodize damage → reject to supplier. Primer pocket out-of-spec → scrap.' },
+  { num: 3, title: 'Primer Installation', hazard: 'yellow', time: '0.3 min/unit', equipment: 'Automated primer seating press (Camdex or equiv.)',
+    instructions: 'Load M42A1 primers into press hopper (anti-static, grounded). Feed cleaned cases to press. Press seats primer to specified depth (3.81mm below case head). 100% depth gauge check at output. Apply lacquer seal over primer.',
+    tooling: 'Primer seating press with depth control, depth go/no-go gauge, lacquer applicator',
+    safety: 'Face shield, anti-static smock, conductive footwear, hearing protection. Max 4 personnel. Primer hopper limited to 5,000 units.',
+    gonogo: 'Primer flush or below case head (no protrusion). Seat depth 3.81mm ±0.05mm. Lacquer seal continuous.',
+    defects: 'High primer (protrusion) → CRITICAL SAFETY REJECT, scrap. Cocked primer → scrap. Shallow seat → re-press if within 1 attempt limit.' },
+  { num: 4, title: 'Propellant Weighing & Loading', hazard: 'yellow', time: '0.4 min/unit', equipment: 'Precision volumetric charger, analytical balance (±0.001g)',
+    instructions: 'Set volumetric charger to dispense 4.2g M2 propellant. Verify charge weight on analytical balance every 50th round (SPC). Load propellant into primed case. Level charge (do not compress).',
+    tooling: 'Volumetric powder measure (adjustable), Sartorius analytical balance, anti-static powder funnel',
+    safety: 'Anti-static smock, conductive shoes, face shield. Propellant is Class 1.3C — no ignition sources. Max 10kg propellant in work area.',
+    gonogo: 'Charge weight 4.2g ±0.05g per SPC sampling. No spilled propellant on case mouth area.',
+    defects: 'Overcharge → remove propellant, re-weigh. Undercharge → add to weight. Spilled propellant → clean with anti-static brush, wet-sweep spills on floor.' },
+  { num: 5, title: 'Projectile Body Assembly', hazard: 'green', time: '1.0 min/unit', equipment: 'Assembly fixture, torque driver',
+    instructions: 'Insert copper shaped charge liner into frag body cavity (press fit, alignment fixture ensures concentricity). Verify liner seating with depth gauge. Body is now ready for explosive fill.',
+    tooling: 'Liner insertion fixture (precision-ground, centering), depth gauge, assembly press (hand or pneumatic)',
+    safety: 'Safety glasses. No explosive components at this stage — inert assembly.',
+    gonogo: 'Liner fully seated, concentricity verified (TIR ≤0.05mm at liner rim). No damage to liner surface.',
+    defects: 'Liner cocked/misaligned → remove and re-seat (max 2 attempts). Damaged liner surface → replace liner. Tight/loose fit → verify body bore dimensions.' },
+  { num: 6, title: 'Explosive Fill Operation', hazard: 'red', time: '2.0 min/unit', equipment: 'Hydraulic press (50-ton), pressing dies, temperature monitoring',
+    instructions: 'CRITICAL SAFETY OPERATION. Weigh Comp A5 charge (39g ±0.5g) on tared balance. Transfer to pressing die. Position projectile body (with liner) in die. Apply pressing force gradually (ramp ≤5,000 PSI/sec) to 20,000 PSI. Hold 5 seconds. Release. Remove and weigh assembled unit. Verify density on every 25th unit (water immersion).',
+    tooling: 'Hydraulic press with force control, hardened SS dies (polished <0.4µm Ra), analytical balance, thermocouple, water immersion density apparatus',
+    safety: 'MAXIMUM 3 PERSONNEL in pressing bay. Anti-static clothing, conductive footwear, face shield, hearing protection. Brass/BeCu tools ONLY. Die temperature monitor — abort if >80°C. Emergency stop within arm\'s reach.',
+    gonogo: 'Fill weight 39g ±0.5g. Density 1.63 ±0.02 g/cm³. Die temp <80°C. No cracking or voids visible.',
+    defects: 'Low density → re-press (1 attempt max) or scrap. Cracked pellet → scrap (explosive disposal procedure). Die temp exceeded → stop operations, cool, inspect die.' },
+  { num: 7, title: 'Tungsten Fragment Over-mold', hazard: 'green', time: '0.8 min/unit', equipment: 'Injection molding machine (80-ton), multi-cavity mold',
+    instructions: 'Pre-load tungsten spheres (~400 per cavity) into mold insert. Close mold. Inject PA66-GF30 at 280°C melt temp. Cool cycle ~30 sec. Eject part. Verify sphere count by weight. Visual inspection for voids, short shots, flash.',
+    tooling: '4-cavity injection mold, sphere loading fixture, weight verification scale',
+    safety: 'Standard injection molding safety. Safety glasses, heat-resistant gloves for part handling. No explosive components at this station.',
+    gonogo: 'Weight within spec (indicating correct sphere count). No visible voids, short shots, or flash. Color match to standard.',
+    defects: 'Short shot → scrap. Missing spheres (underweight) → scrap. Flash → trim if minor, scrap if structural.' },
+  { num: 8, title: 'Fuze Thread & Install', hazard: 'yellow', time: '0.5 min/unit', equipment: 'Torque-controlled driver, thread gauges',
+    instructions: 'Apply thread sealant (MIL-S-22473) to M550A1 fuze threads. Thread fuze into projectile body by hand (2-3 turns to confirm engagement). Torque to 15 ±2 ft-lb using calibrated torque wrench. Verify with thread go/no-go gauge before installation.',
+    tooling: 'Calibrated torque wrench (ft-lb range), thread go/no-go gauges (1.0"-18 UNEF), sealant applicator',
+    safety: 'Anti-static clothing, conductive shoes, face shield. Fuzes contain primary explosive — handle with care. No dropping. Max 4 personnel.',
+    gonogo: 'Torque 15 ±2 ft-lb. Thread engagement ≥5 full turns. Sealant visible at thread junction. No cross-threading.',
+    defects: 'Cross-threaded → DO NOT FORCE — remove fuze, inspect threads, re-tap if allowed or scrap body. Under-torque → re-torque. Over-torque → inspect for thread damage.' },
+  { num: 9, title: 'Final Projectile Assembly', hazard: 'yellow', time: '0.6 min/unit', equipment: 'Assembly fixture, adhesive applicator',
+    instructions: 'Mate ogive (with tungsten matrix) onto projectile body. Ensure snap-fit engagement at break-away groove. Apply circumferential sealant at ogive-body junction. Verify overall projectile length and profile.',
+    tooling: 'Ogive installation fixture, sealant gun, length gauge, profile template',
+    safety: 'Round now contains live explosive and fuze — handle as Class 1.4S. Anti-static, face shield.',
+    gonogo: 'Ogive fully seated. Sealant 360° coverage. Overall projectile length within spec. No gaps or misalignment.',
+    defects: 'Ogive loose → check snap features, replace ogive if worn. Sealant gap → re-apply. Length out → investigate component dimensions.' },
+  { num: 10, title: 'Cartridge-Projectile Mating', hazard: 'yellow', time: '0.4 min/unit', equipment: 'Projectile seating press, depth gauge',
+    instructions: 'Insert assembled projectile into loaded cartridge case (propellant already loaded). Seat to specified depth using calibrated press. Verify seating depth with gauge. Projectile should resist 20-lb pull-out force minimum.',
+    tooling: 'Seating press with adjustable depth stop, seating depth gauge, pull-out force tester (sample)',
+    safety: 'Live round with explosive components — handle carefully. Anti-static, face shield.',
+    gonogo: 'Seating depth per drawing ±0.1mm. Pull-out force ≥20 lb (sample test).',
+    defects: 'Deep seat → may affect ballistics, gauge carefully. Shallow seat → re-seat. Loose projectile → check case mouth dimensions.' },
+  { num: 11, title: 'Rotating Band Application', hazard: 'green', time: '0.3 min/unit', equipment: 'Band swaging press',
+    instructions: 'Place pre-formed copper band over projectile body at band groove location. Swage band into groove using swaging die set. Verify band OD, width, and concentricity.',
+    tooling: 'Band swaging press and die set, ring gauge for band OD, width gauge',
+    safety: 'Live round — handle appropriately. Standard PPE.',
+    gonogo: 'Band OD 40.5mm ±0.05mm. Band width 6.0mm ±0.2mm. Concentric, no cracks or cold shuts.',
+    defects: 'Cracked band → replace (remove and re-swage). Undersized OD → reject band stock. Eccentric → re-swage or scrap round.' },
+  { num: 12, title: 'Crimping & Waterproof Sealing', hazard: 'green', time: '0.4 min/unit', equipment: 'Crimp station, sealant applicator, UV lamp',
+    instructions: 'Apply segmented crimp at case mouth to retain projectile. Verify crimp depth and uniformity. Apply waterproof sealant (typically red or green lacquer) to case mouth-projectile junction. Verify 360° coverage under UV lamp (fluorescent sealant).',
+    tooling: 'Crimping die set, crimp go/no-go gauge, lacquer applicator, UV inspection lamp',
+    safety: 'Live round. Standard PPE.',
+    gonogo: 'Crimp uniform, meets gauge. Sealant 360° continuous under UV. No case mouth splits.',
+    defects: 'Split case mouth → scrap round (case failure, cannot repair). Incomplete crimp → re-crimp. Sealant gap → re-apply and re-inspect.' },
+  { num: 13, title: 'Dimensional & Weight QC', hazard: 'green', time: '0.5 min/unit', equipment: 'Gauges, calipers, precision scale',
+    instructions: '100% inspection: overall length (112mm ±0.5mm), maximum diameter, weight (340g ±5g), chamber gauge check (must fit reference chamber). Record data for SPC on every 50th unit.',
+    tooling: 'Overall length gauge, ring gauge, reference chamber gauge (go gauge), precision scale (±0.1g)',
+    safety: 'Live round. Standard PPE. Handle with care.',
+    gonogo: 'All dimensions within tolerance. Weight within spec. Fits chamber gauge. No visual defects.',
+    defects: 'Overweight → investigate component weights. Overlength → check projectile seating depth. Won\'t chamber → identify interfering dimension, scrap if not correctable.' },
+  { num: 14, title: 'Visual Inspection & Lot Marking', hazard: 'green', time: '0.3 min/unit', equipment: '10× magnification station, marking equipment',
+    instructions: 'Final visual inspection under 10× magnification: check for dents, scratches, sealant defects, marking legibility. Verify lot number, manufacturer code, and date code on headstamp. Apply additional lot markings per contract requirements (ink jet or laser).',
+    tooling: '10× illuminated magnifier, lot marking printer (ink jet or laser engraver)',
+    safety: 'Live round. Standard PPE.',
+    gonogo: 'No cosmetic defects exceeding acceptance criteria. All markings legible and correct. Sealant intact.',
+    defects: 'Illegible marking → re-mark. Cosmetic damage → disposition per visual acceptance criteria (MIL-STD-2073). Sealant damage → re-seal and re-inspect.' },
+  { num: 15, title: 'Function Test (Sample)', hazard: 'red', time: 'Per test plan', equipment: 'Proof barrel, chronograph, pressure instrumentation, witness plates',
+    instructions: 'Sample rounds from each lot per MIL-STD-1916 for live-fire testing. Measure muzzle velocity (76 ±3 m/s), chamber pressure (≤3,000 PSI), accuracy (at 200m), penetration (≥63mm RHA), and fragmentation pattern. All testing at approved range facility.',
+    tooling: 'Proof barrel (remotely fired), Doppler chronograph, piezoelectric pressure transducer, RHA witness plate (MIL-DTL-12560), fragmentation arena',
+    safety: 'RANGE SAFETY PROTOCOLS. Minimum 200m from firing point. All personnel in bunker during fire. Range safety officer in charge. Medical standby.',
+    gonogo: 'Velocity within spec. Pressure within MAP. Penetration ≥63mm. Fuze function rate ≥99% of samples. Fragmentation per spec.',
+    defects: 'Lot failure on velocity → investigate propellant lot, charge weight. Dud (fuze failure) → investigate fuze lot. Penetration failure → investigate liner concentricity, explosive density.' },
+  { num: 16, title: 'Packaging', hazard: 'green', time: '2 min/can', equipment: 'Packing bench, M2A1 ammunition cans, desiccant',
+    instructions: 'Pack 48 rounds per M2A1 ammunition can with foam inserts. Include desiccant packet and humidity indicator card. Seal can lid. Apply lot label (NSN, lot number, quantity, date, HD/CG classification). Band and seal.',
+    tooling: 'M2A1 cans (reusable), foam inserts, desiccant packets, humidity cards, label printer, can sealer',
+    safety: 'Standard PPE. Limit lift weight per ergonomic standards.',
+    gonogo: 'Correct count (48 rds/can). Desiccant present. Label correct and legible. Can sealed properly.',
+    defects: 'Incorrect count → recount. Wrong label → replace. Damaged can → replace can.' },
+  { num: 17, title: 'Palletizing & Warehousing', hazard: 'green', time: '10 min/pallet', equipment: 'Pallet jack, stretch wrapper, warehouse management system',
+    instructions: 'Stack M2A1 cans on standard 40×48" pallets. Maximum 4 layers high. Stretch wrap. Apply pallet placard (lot, quantity, destination, HD classification). Enter into WMS with storage location. Store per SB 742-1 requirements (conditioned storage preferred).',
+    tooling: 'Pallet jack, stretch wrapper, WMS barcode scanner, pallet placards',
+    safety: 'Forklift certification required. Follow material handling weight limits. Storage per Q-D tables if applicable.',
+    gonogo: 'Correct stack pattern. Placards match contents. WMS record matches physical inventory.',
+    defects: 'Unstable stack → re-palletize. WMS discrepancy → physical count reconciliation.' }
+];
+
+const flowContainer = document.getElementById('assemblyFlow');
+assemblySteps.forEach(step => {
+  const node = document.createElement('div');
+  node.className = `flow-node ${step.hazard}`;
+  node.innerHTML = `
+    <div class="fn-num">Step ${step.num}</div>
+    <div class="fn-title">${step.title}</div>
+    <div class="fn-meta"><span>⏱ ${step.time}</span><span>${step.hazard === 'red' ? '🔴 Explosive Ops' : step.hazard === 'yellow' ? '🟡 Caution' : '🟢 Standard'}</span></div>
+  `;
+  node.addEventListener('click', () => {
+    const existing = node.querySelector('.accordion-content');
+    if (existing) { existing.remove(); return; }
+    // Remove other expanded
+    flowContainer.querySelectorAll('.accordion-content').forEach(e => e.remove());
+    const detail = document.createElement('div');
+    detail.className = 'accordion-content';
+    detail.style.borderTop = '1px solid var(--border)';
+    detail.style.marginTop = '1rem';
+    detail.style.paddingTop = '1rem';
+    detail.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><h4 style="color:var(--accent);margin-bottom:.5rem">Work Instructions</h4><p style="font-size:.88rem;color:var(--text2);line-height:1.7">${step.instructions}</p></div>
+        <div><h4 style="color:var(--accent);margin-bottom:.5rem">Equipment & Tooling</h4><p style="font-size:.88rem;color:var(--text2);line-height:1.7"><strong>Equipment:</strong> ${step.equipment}<br><strong>Tooling:</strong> ${step.tooling}</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem">
+        <div><h4 style="color:var(--yellow);margin-bottom:.5rem">Safety & PPE</h4><p style="font-size:.88rem;color:var(--text2);line-height:1.7">${step.safety}</p></div>
+        <div><h4 style="color:var(--accent);margin-bottom:.5rem">Go/No-Go Criteria</h4><p style="font-size:.88rem;color:var(--text2);line-height:1.7">${step.gonogo}</p></div>
+      </div>
+      <div style="margin-top:1rem"><h4 style="color:var(--red);margin-bottom:.5rem">Common Defects & Remediation</h4><p style="font-size:.88rem;color:var(--text2);line-height:1.7">${step.defects}</p></div>
+    `;
+    node.appendChild(detail);
+  });
+  flowContainer.appendChild(node);
+
+  if (step.num < assemblySteps.length) {
+    const conn = document.createElement('div');
+    conn.className = 'flow-connector';
+    conn.textContent = '↓';
+    flowContainer.appendChild(conn);
+  }
+});
+
+// ===== Calculators =====
+function calcRate() {
+  const qty = +document.getElementById('rc-qty').value;
+  const shifts = +document.getElementById('rc-shifts').value;
+  const lines = +document.getElementById('rc-lines').value;
+  const rate = +document.getElementById('rc-rate').value;
+  const price = +document.getElementById('rc-price').value;
+  const cogs = +document.getElementById('rc-cogs').value;
+  const dailyOutput = shifts * lines * rate;
+  const days = Math.ceil(qty / dailyOutput);
+  document.getElementById('rc-days').textContent = days.toLocaleString();
+  document.getElementById('rc-revenue').textContent = '$' + (qty * price).toLocaleString();
+  document.getElementById('rc-totalcogs').textContent = '$' + (qty * cogs).toLocaleString();
+  document.getElementById('rc-profit').textContent = '$' + (qty * (price - cogs)).toLocaleString();
+}
+
+function calcOEE() {
+  const a = +document.getElementById('oee-avail').value / 100;
+  const p = +document.getElementById('oee-perf').value / 100;
+  const q = +document.getElementById('oee-qual').value / 100;
+  const oee = a * p * q * 100;
+  document.getElementById('oee-score').textContent = oee.toFixed(1) + '%';
+  document.getElementById('oee-score').style.color = oee >= 85 ? 'var(--accent)' : oee >= 65 ? 'var(--blue)' : oee >= 40 ? 'var(--yellow)' : 'var(--red)';
+}
+
+function calcCapacity() {
+  const lines = +document.getElementById('cap-lines').value;
+  const shifts = +document.getElementById('cap-shifts').value;
+  const rate = +document.getElementById('cap-rate').value;
+  const days = +document.getElementById('cap-days').value;
+  const oee = +document.getElementById('cap-oee').value / 100;
+  const theo = lines * shifts * rate * days;
+  const eff = Math.round(theo * oee);
+  document.getElementById('cap-theo').textContent = theo.toLocaleString();
+  document.getElementById('cap-eff').textContent = eff.toLocaleString();
+  document.getElementById('cap-annual').textContent = (eff * 12).toLocaleString();
+}
+
+function calcBreakEven() {
+  const fixed = +document.getElementById('be-fixed').value;
+  const varCost = +document.getElementById('be-var').value;
+  const price = +document.getElementById('be-price').value;
+  const cm = price - varCost;
+  const vol = Math.ceil(fixed / cm);
+  document.getElementById('be-vol').textContent = vol.toLocaleString();
+  document.getElementById('be-cm').textContent = '$' + cm.toFixed(2);
+  document.getElementById('be-cmr').textContent = ((cm / price) * 100).toFixed(1) + '%';
+}
+
+function calcLotSize() {
+  const D = +document.getElementById('ls-demand').value;
+  const S = +document.getElementById('ls-setup').value;
+  const H = +document.getElementById('ls-hold').value;
+  const eoq = Math.round(Math.sqrt(2 * D * S / H));
+  const lots = D / eoq;
+  const cost = Math.round(lots * S + (eoq / 2) * H);
+  document.getElementById('ls-eoq').textContent = eoq.toLocaleString();
+  document.getElementById('ls-lots').textContent = lots.toFixed(1);
+  document.getElementById('ls-cost').textContent = '$' + cost.toLocaleString();
+}
+
+// BOM Calculator
+document.querySelectorAll('.bom-cost').forEach(input => {
+  input.addEventListener('input', updateBOM);
+});
+function updateBOM() {
+  let total = 0;
+  const rows = document.querySelectorAll('#bom-table tbody tr');
+  rows.forEach(row => {
+    const cost = +row.querySelector('.bom-cost').value;
+    total += cost;
+    row.querySelector('.bom-ext').textContent = cost.toFixed(2);
+  });
+  document.getElementById('bom-total').textContent = '$' + total.toFixed(2);
+  const margin = ((45 - total) / 45 * 100);
+  document.getElementById('bom-margin').textContent = margin.toFixed(1) + '%';
+  document.getElementById('bom-margin').style.color = margin > 30 ? 'var(--accent)' : margin > 15 ? 'var(--yellow)' : 'var(--red)';
+}
+
+// ===== Conversions =====
+function convertWeight() {
+  const val = +document.getElementById('conv-wt-val').value;
+  const from = document.getElementById('conv-wt-from').value;
+  const toG = { g: 1, kg: 1000, oz: 28.3495, lb: 453.592, gr: 0.0647989 };
+  const grams = val * toG[from];
+  document.getElementById('conv-wt-result').innerHTML = `
+    <strong>${grams.toFixed(4)}</strong> grams<br>
+    <strong>${(grams/1000).toFixed(6)}</strong> kilograms<br>
+    <strong>${(grams/28.3495).toFixed(4)}</strong> ounces<br>
+    <strong>${(grams/453.592).toFixed(4)}</strong> pounds<br>
+    <strong>${(grams/0.0647989).toFixed(1)}</strong> grains
+  `;
+}
+
+function convertTemp() {
+  const val = +document.getElementById('conv-temp-val').value;
+  const from = document.getElementById('conv-temp-from').value;
+  let c, f, k;
+  if (from === 'C') { c = val; f = val * 9/5 + 32; k = val + 273.15; }
+  else if (from === 'F') { c = (val - 32) * 5/9; f = val; k = c + 273.15; }
+  else { k = val; c = val - 273.15; f = c * 9/5 + 32; }
+  document.getElementById('conv-temp-result').innerHTML = `
+    <strong>${c.toFixed(2)}</strong> °C<br>
+    <strong>${f.toFixed(2)}</strong> °F<br>
+    <strong>${k.toFixed(2)}</strong> K
+  `;
+}
+
+function convertPressure() {
+  const val = +document.getElementById('conv-pres-val').value;
+  const from = document.getElementById('conv-pres-from').value;
+  const toPSI = { psi: 1, bar: 14.5038, mpa: 145.038, atm: 14.696 };
+  const psi = val * toPSI[from];
+  document.getElementById('conv-pres-result').innerHTML = `
+    <strong>${psi.toFixed(2)}</strong> PSI<br>
+    <strong>${(psi/14.5038).toFixed(4)}</strong> bar<br>
+    <strong>${(psi/145.038).toFixed(4)}</strong> MPa<br>
+    <strong>${(psi/14.696).toFixed(4)}</strong> atm
+  `;
+}
+
+function convertLength() {
+  const val = +document.getElementById('conv-len-val').value;
+  const from = document.getElementById('conv-len-from').value;
+  const toMM = { mm: 1, cm: 10, m: 1000, 'in': 25.4, ft: 304.8 };
+  const mm = val * toMM[from];
+  document.getElementById('conv-len-result').innerHTML = `
+    <strong>${mm.toFixed(4)}</strong> mm<br>
+    <strong>${(mm/10).toFixed(4)}</strong> cm<br>
+    <strong>${(mm/1000).toFixed(6)}</strong> m<br>
+    <strong>${(mm/25.4).toFixed(4)}</strong> inches<br>
+    <strong>${(mm/304.8).toFixed(4)}</strong> feet
+  `;
+}
+
+// ===== Search =====
+const searchData = [
+  { text: 'M433A1 Round Overview Specifications', section: 'overview', label: 'Round Overview' },
+  { text: 'M118A1 Cartridge Case Aluminum 6061-T6', section: 'comp-case', label: 'M118A1 Case' },
+  { text: 'M42A1 Primer Percussion Stab-Initiated', section: 'comp-primer', label: 'M42A1 Primer' },
+  { text: 'M2 Propellant Nitrocellulose Charge Weight', section: 'comp-propellant', label: 'M2 Propellant' },
+  { text: 'Copper Shaped Charge Liner OFHC Penetration', section: 'comp-liner', label: 'Shaped Charge Liner' },
+  { text: 'Comp A5 RDX Explosive Fill Pressing', section: 'comp-explosive', label: 'Comp A5 Explosive' },
+  { text: 'Steel Fragmentation Body AISI 1045 Scored', section: 'comp-fragbody', label: 'Frag Body' },
+  { text: 'Tungsten Fragment Matrix Spheres Anti-Personnel', section: 'comp-tungsten', label: 'Tungsten Matrix' },
+  { text: 'Plastic Ogive Aerodynamic PA66 Break-Away', section: 'comp-ogive', label: 'Plastic Ogive' },
+  { text: 'M550A1 Fuze Point Detonating Superquick Graze Arming', section: 'comp-fuze', label: 'M550A1 Fuze' },
+  { text: 'Rotating Band Copper Rifling Spin', section: 'comp-band', label: 'Rotating Band' },
+  { text: 'Assembly Process Flowchart Production Steps', section: 'assembly', label: 'Assembly Process' },
+  { text: 'Quality Control Inspection SPC Sampling MIL-STD-1916', section: 'quality', label: 'Quality Control' },
+  { text: 'ITAR USML Regulatory Compliance ATF Export', section: 'regulatory', label: 'Regulatory' },
+  { text: 'Safety Manual Emergency Response PPE Explosive Q-D', section: 'safety', label: 'Safety Manual' },
+  { text: 'Supply Chain Suppliers Lead Time Inventory', section: 'supply', label: 'Supply Chain' },
+  { text: 'Calculator Rate BOM OEE Capacity Break-Even', section: 'calculators', label: 'Calculators' },
+  { text: 'Glossary Acronyms MIL-SPEC Conversion Reference', section: 'glossary', label: 'Glossary' },
+  { text: 'Armor Penetration RHA 63mm Shaped Charge', section: 'comp-liner', label: 'Shaped Charge Liner' },
+  { text: 'Muzzle Velocity 76 m/s Ballistic', section: 'overview', label: 'Round Overview' },
+  { text: 'NCR CAPA Corrective Preventive Action Quality', section: 'quality', label: 'Quality Control' }
+];
+
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+if(searchInput) {
+  searchInput.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    if(q.length < 2) { searchResults.style.display = 'none'; return; }
+    const matches = searchIndex.filter(item => item.text.toLowerCase().includes(q));
+    if(matches.length > 0) {
+      searchResults.innerHTML = matches.slice(0,8).map(m => 
+        `<div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05)" onclick="showSection('${m.section}');searchResults.style.display='none';searchInput.value=''">${m.label}</div>`
+      ).join('');
+      searchResults.style.display = 'block';
+    } else {
+      searchResults.innerHTML = '<div style="padding:8px 12px;color:var(--text-dim)">No results found</div>';
+      searchResults.style.display = 'block';
+    }
+  });
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const section = document.getElementById(id);
+  if(section) section.style.display = 'block';
+  const navItem = document.querySelector(`[data-section="${id}"]`);
+  if(navItem) navItem.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// Production Rate Calculator
+function calcProductionRate() {
+  const qty = parseInt(document.getElementById('calcOrderQty')?.value || 50000);
+  const shifts = parseInt(document.getElementById('calcShifts')?.value || 1);
+  const lines = parseInt(document.getElementById('calcLines')?.value || 1);
+  const ratePerShiftPerLine = 3333; // rounds per day per shift per line
+  const dailyRate = ratePerShiftPerLine * shifts * lines;
+  const prodDays = Math.ceil(qty / dailyRate);
+  const calendarDays = Math.ceil(prodDays * 7 / 5); // account for weekends
+  const materialCost = qty * 32.00;
+  const laborCost = qty * 4.50;
+  const totalCost = qty * 41.80;
+  const el = document.getElementById('calcOutput');
+  if(el) el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:16px">
+      <div style="background:rgba(0,255,136,0.1);padding:12px;border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--text-dim)">PRODUCTION DAYS</div>
+        <div style="font-size:24px;font-weight:700;color:var(--accent)">${prodDays}</div>
+      </div>
+      <div style="background:rgba(0,255,136,0.1);padding:12px;border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--text-dim)">CALENDAR DAYS</div>
+        <div style="font-size:24px;font-weight:700;color:var(--accent)">${calendarDays}</div>
+      </div>
+      <div style="background:rgba(0,255,136,0.1);padding:12px;border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--text-dim)">DAILY OUTPUT</div>
+        <div style="font-size:24px;font-weight:700;color:var(--accent)">${dailyRate.toLocaleString()}</div>
+      </div>
+      <div style="background:rgba(0,255,136,0.1);padding:12px;border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--text-dim)">MATERIAL COST</div>
+        <div style="font-size:24px;font-weight:700;color:var(--accent)">$${(materialCost/1000000).toFixed(2)}M</div>
+      </div>
+      <div style="background:rgba(0,255,136,0.1);padding:12px;border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--text-dim)">TOTAL COST</div>
+        <div style="font-size:24px;font-weight:700;color:var(--accent)">$${(totalCost/1000000).toFixed(2)}M</div>
+      </div>
+      <div style="background:rgba(0,255,136,0.1);padding:12px;border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--text-dim)">EST. COMPLETION</div>
+        <div style="font-size:24px;font-weight:700;color:var(--accent)">${Math.ceil(calendarDays/30)} mo</div>
+      </div>
+    </div>`;
+}
+
+// BOM Cost Calculator
+function calcBOMCost() {
+  const fields = ['bomCase','bomPrimer','bomPropellant','bomLiner','bomCompA5','bomFragBody','bomTungsten','bomOgive','bomFuze','bomBand','bomSealant','bomInk'];
+  const defaults = [3.20, 0.45, 1.80, 2.10, 4.50, 3.80, 5.20, 1.40, 8.50, 0.85, 0.15, 0.05];
+  let total = 0;
+  fields.forEach((f,i) => {
+    const val = parseFloat(document.getElementById(f)?.value || defaults[i]);
+    total += val;
+  });
+  const labor = 4.50, overhead = 3.50, qc = 1.00, packaging = 0.80;
+  const fullCost = total + labor + overhead + qc + packaging;
+  const el = document.getElementById('bomOutput');
+  if(el) el.innerHTML = `<div style="margin-top:12px;font-size:14px"><strong>Material Cost/Round:</strong> $${total.toFixed(2)} | <strong>Full Cost/Round:</strong> $${fullCost.toFixed(2)} | <strong>Margin @ $46.50:</strong> $${(46.50-fullCost).toFixed(2)} (${((46.50-fullCost)/46.50*100).toFixed(1)}%)</div>`;
+}
+
+// OEE Calculator
+function calcOEE() {
+  const avail = parseFloat(document.getElementById('oeeAvail')?.value || 90) / 100;
+  const perf = parseFloat(document.getElementById('oeePerf')?.value || 85) / 100;
+  const qual = parseFloat(document.getElementById('oeeQual')?.value || 98) / 100;
+  const oee = (avail * perf * qual * 100).toFixed(1);
+  const color = oee >= 85 ? 'var(--accent)' : oee >= 65 ? 'var(--warning)' : 'var(--danger)';
+  const rating = oee >= 85 ? 'WORLD CLASS' : oee >= 65 ? 'GOOD' : oee >= 40 ? 'NEEDS IMPROVEMENT' : 'CRITICAL';
+  const el = document.getElementById('oeeOutput');
+  if(el) el.innerHTML = `<div style="text-align:center;margin-top:16px"><div style="font-size:48px;font-weight:700;color:${color}">${oee}%</div><div style="font-size:14px;color:${color};font-weight:600">${rating}</div></div>`;
+}
+
+// Initialize first section
+document.querySelector('.nav-item')?.click();
+
+// Accordion toggles
+document.querySelectorAll('.accordion-header').forEach(h => {
+  h.addEventListener('click', () => {
+    const content = h.nextElementSibling;
+    if(content) content.style.display = content.style.display === 'none' ? 'block' : 'none';
+    h.classList.toggle('open');
+  });
+});
+</script>
+</body>
+</html>

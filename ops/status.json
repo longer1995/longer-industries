@@ -1,0 +1,33 @@
+{
+  "lastUpdated": "2026-03-09T21:10:00Z",
+  "team": {
+    "brandon": {
+      "role": "CEO / Founder",
+      "status": "active",
+      "focus": "Strategy & Business Development"
+    },
+    "carolinux": {
+      "role": "AI Operations & Co-Builder",
+      "status": "online",
+      "focus": "Research, Automation, Execution"
+    }
+  },
+  "backlog": [
+    { "id": "B-001", "title": "Import ChatGPT history", "priority": "high", "status": "waiting", "owner": "brandon", "note": "Waiting on export zip" },
+    { "id": "B-002", "title": "Connect messaging channel", "priority": "medium", "status": "todo", "owner": "both" },
+    { "id": "B-003", "title": "Confirm timezone", "priority": "low", "status": "todo", "owner": "brandon" },
+    { "id": "B-004", "title": "Business idea brainstorm", "priority": "high", "status": "todo", "owner": "both" },
+    { "id": "B-005", "title": "Career strategy & positioning", "priority": "high", "status": "todo", "owner": "both" },
+    { "id": "B-006", "title": "Delete BOOTSTRAP.md", "priority": "low", "status": "todo", "owner": "carolinux" }
+  ],
+  "completed": [
+    { "id": "C-001", "title": "Initial setup & identity", "completedDate": "2026-03-09", "owner": "both" },
+    { "id": "C-002", "title": "USER.md populated", "completedDate": "2026-03-09", "owner": "carolinux" },
+    { "id": "C-003", "title": "Mission Control built", "completedDate": "2026-03-09", "owner": "carolinux" }
+  ],
+  "calendar": [
+    { "date": "2026-03-09", "event": "🐧 Carolinux online — Day One", "type": "milestone" },
+    { "date": "2026-03-10", "event": "ChatGPT import (pending export)", "type": "task" },
+    { "date": "2026-03-10", "event": "Business brainstorm session", "type": "task" }
+  ]
+}

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐧 Mission Control — Carolinux & Brandon</title>
+<style>
+  :root {
+    --bg: #0a0e17;
+    --card: #131a2b;
+    --border: #1e2a42;
+    --accent: #4fc3f7;
+    --green: #66bb6a;
+    --yellow: #fdd835;
+    --red: #ef5350;
+    --orange: #ffa726;
+    --text: #e0e6f0;
+    --dim: #7a8ba7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 28px;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+  .header .subtitle {
+    color: var(--dim);
+    font-size: 13px;
+    margin-top: 6px;
+  }
+  .header .live {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 3px 12px;
+    background: rgba(102,187,106,0.15);
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    color: var(--green);
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .live::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card.full { grid-column: 1 / -1; }
+  .card h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h2 .icon { font-size: 18px; }
+
+  /* Org Chart */
+  .org {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .org-member {
+    text-align: center;
+    padding: 16px 24px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-width: 200px;
+    position: relative;
+  }
+  .org-member.ceo { border-color: var(--orange); }
+  .org-member.ai { border-color: var(--accent); }
+  .org-member .name { font-size: 18px; font-weight: bold; }
+  .org-member .role { color: var(--dim); font-size: 12px; margin-top: 4px; }
+  .org-member .focus { color: var(--yellow); font-size: 11px; margin-top: 8px; }
+  .org-member .badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 20px;
+  }
+  .org-connector {
+    display: flex;
+    align-items: center;
+    color: var(--dim);
+    font-size: 24px;
+  }
+
+  /* Backlog */
+  .task-list { list-style: none; }
+  .task-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(30,42,66,0.5);
+    gap: 12px;
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-id {
+    font-size: 11px;
+    color: var(--dim);
+    min-width: 48px;
+  }
+  .task-title { flex: 1; font-size: 14px; }
+  .task-owner {
+    font-size: 11px;
+    color: var(--dim);
+    min-width: 70px;
+    text-align: right;
+  }
+  .priority {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+  .priority.high { background: rgba(239,83,80,0.15); color: var(--red); }
+  .priority.medium { background: rgba(255,167,38,0.15); color: var(--orange); }
+  .priority.low { background: rgba(79,195,247,0.15); color: var(--accent); }
+  .status-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .status-badge.waiting { background: rgba(253,216,53,0.15); color: var(--yellow); }
+  .status-badge.todo { background: rgba(122,139,167,0.15); color: var(--dim); }
+  .status-badge.done { background: rgba(102,187,106,0.15); color: var(--green); }
+
+  /* Completed */
+  .completed-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    gap: 12px;
+    border-bottom: 1px solid rgba(30,42,66,0.3);
+  }
+  .completed-item:last-child { border-bottom: none; }
+  .check { color: var(--green); font-size: 16px; }
+  .completed-title { flex: 1; font-size: 14px; color: var(--dim); text-decoration: line-through; }
+  .completed-date { font-size: 11px; color: var(--dim); }
+
+  /* Calendar */
+  .cal-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(30,42,66,0.5);
+    gap: 12px;
+  }
+  .cal-item:last-child { border-bottom: none; }
+  .cal-date {
+    font-size: 12px;
+    color: var(--accent);
+    min-width: 90px;
+    font-weight: bold;
+  }
+  .cal-event { flex: 1; font-size: 14px; }
+  .cal-type {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .cal-type.milestone { background: rgba(79,195,247,0.15); color: var(--accent); }
+  .cal-type.task { background: rgba(255,167,38,0.15); color: var(--orange); }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .stat {
+    text-align: center;
+    padding: 12px 24px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-width: 120px;
+  }
+  .stat .num {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--accent);
+  }
+  .stat .label {
+    font-size: 11px;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+  .stat.green .num { color: var(--green); }
+  .stat.yellow .num { color: var(--yellow); }
+  .stat.red .num { color: var(--red); }
+
+  .footer {
+    text-align: center;
+    margin-top: 32px;
+    color: var(--dim);
+    font-size: 11px;
+  }
+
+  @media (max-width: 700px) {
+    .grid { grid-template-columns: 1fr; }
+    .org { flex-direction: column; align-items: center; }
+    .org-connector { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🐧 MISSION CONTROL</h1>
+  <div class="subtitle">Carolinux & Brandon — Command Operations</div>
+  <div class="live">SYSTEMS ONLINE</div>
+</div>
+
+<!-- Stats -->
+<div class="grid">
+  <div class="card full">
+    <h2><span class="icon">📊</span> Overview</h2>
+    <div class="stats">
+      <div class="stat green">
+        <div class="num" id="completedCount">3</div>
+        <div class="label">Completed</div>
+      </div>
+      <div class="stat yellow">
+        <div class="num" id="inProgressCount">1</div>
+        <div class="label">In Progress</div>
+      </div>
+      <div class="stat red">
+        <div class="num" id="backlogCount">6</div>
+        <div class="label">Backlog</div>
+      </div>
+      <div class="stat">
+        <div class="num">1</div>
+        <div class="label">Days Active</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Org Chart -->
+  <div class="card full">
+    <h2><span class="icon">👥</span> Team</h2>
+    <div class="org">
+      <div class="org-member ceo">
+        <div class="badge">👑</div>
+        <div class="name">Brandon</div>
+        <div class="role">CEO / Founder</div>
+        <div class="focus">Strategy & Business Development</div>
+      </div>
+      <div class="org-connector">⟷</div>
+      <div class="org-member ai">
+        <div class="badge">🐧</div>
+        <div class="name">Carolinux</div>
+        <div class="role">AI Operations & Co-Builder</div>
+        <div class="focus">Research, Automation, Execution</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backlog -->
+  <div class="card">
+    <h2><span class="icon">📋</span> Backlog</h2>
+    <ul class="task-list" id="backlog">
+      <li class="task-item">
+        <span class="task-id">B-001</span>
+        <span class="task-title">Import ChatGPT history</span>
+        <span class="priority high">high</span>
+        <span class="status-badge waiting">waiting</span>
+        <span class="task-owner">brandon</span>
+      </li>
+      <li class="task-item">
+        <span class="task-id">B-004</span>
+        <span class="task-title">Business idea brainstorm</span>
+        <span class="priority high">high</span>
+        <span class="status-badge todo">todo</span>
+        <span class="task-owner">both</span>
+      </li>
+      <li class="task-item">
+        <span class="task-id">B-005</span>
+        <span class="task-title">Career strategy & positioning</span>
+        <span class="priority high">high</span>
+        <span class="status-badge todo">todo</span>
+        <span class="task-owner">both</span>
+      </li>
+      <li class="task-item">
+        <span class="task-id">B-002</span>
+        <span class="task-title">Connect messaging channel</span>
+        <span class="priority medium">med</span>
+        <span class="status-badge todo">todo</span>
+        <span class="task-owner">both</span>
+      </li>
+      <li class="task-item">
+        <span class="task-id">B-003</span>
+        <span class="task-title">Confirm timezone</span>
+        <span class="priority low">low</span>
+        <span class="status-badge todo">todo</span>
+        <span class="task-owner">brandon</span>
+      </li>
+      <li class="task-item">
+        <span class="task-id">B-006</span>
+        <span class="task-title">Delete BOOTSTRAP.md</span>
+        <span class="priority low">low</span>
+        <span class="status-badge todo">todo</span>
+        <span class="task-owner">carolinux</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Completed -->
+  <div class="card">
+    <h2><span class="icon">✅</span> Completed</h2>
+    <div id="completed">
+      <div class="completed-item">
+        <span class="check">✓</span>
+        <span class="completed-title">Initial setup & identity</span>
+        <span class="completed-date">Mar 9</span>
+      </div>
+      <div class="completed-item">
+        <span class="check">✓</span>
+        <span class="completed-title">USER.md populated</span>
+        <span class="completed-date">Mar 9</span>
+      </div>
+      <div class="completed-item">
+        <span class="check">✓</span>
+        <span class="completed-title">Mission Control built</span>
+        <span class="completed-date">Mar 9</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="card full">
+    <h2><span class="icon">📅</span> Calendar</h2>
+    <div id="calendar">
+      <div class="cal-item">
+        <span class="cal-date">Mar 9</span>
+        <span class="cal-event">🐧 Carolinux online — Day One</span>
+        <span class="cal-type milestone">milestone</span>
+      </div>
+      <div class="cal-item">
+        <span class="cal-date">Mar 10</span>
+        <span class="cal-event">ChatGPT import (pending export)</span>
+        <span class="cal-type task">task</span>
+      </div>
+      <div class="cal-item">
+        <span class="cal-date">Mar 10</span>
+        <span class="cal-event">Business brainstorm session</span>
+        <span class="cal-type task">task</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  CAROLINUX MISSION CONTROL v1.0 · Last updated: <span id="timestamp"></span>
+</div>
+
+<script>
+  document.getElementById('timestamp').textContent = new Date().toLocaleString();
+</script>
+</body>
+</html>
