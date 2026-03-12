@@ -1,10 +1,17 @@
 # HEARTBEAT.md — Carolinux Idle Tasks
 
+## COST RULES (CRITICAL — $25/day budget)
+- Do NOT spawn sub-agents during heartbeats unless absolutely necessary
+- Do lightweight checks yourself (web search, file reads) instead
+- Only spawn sub-agents for genuinely complex multi-step tasks
+- Max 3 sub-agents per day
+- Skip cycles if nothing meaningful to do — HEARTBEAT_OK is fine
+
 ## Every Heartbeat (30 min cycle)
 1. Check `memory/heartbeat-state.json` for last check times
-2. If job search not checked in 4h: run fresh job scans (tech, energy, defense, startup roles)
-3. If brokerage platform not touched in 4h: work on next feature/improvement
-4. If Twitter strategy not checked in 6h: research monetization opportunities
+2. If job search not checked in 8h: do a quick web search yourself (no sub-agent)
+3. If brokerage platform not touched in 8h: make small improvements directly
+4. If Twitter strategy not checked in 12h: draft content or research trends directly
 5. Update `memory/heartbeat-state.json` with timestamps
 6. Commit any changes to git
 
