@@ -24,9 +24,25 @@ Tapping one opens a recording sheet for that call type:
   then call the `transcribe` Edge Function with the new `call_id`.
 - Also support **Upload recording** and a **VoIP call** placeholder (capture='voip').
 
+**Meetings & calendar (bot recording):** add a **Meetings** area.
+- **Connect Calendly** (Google/Outlook later): writes a `calendar_connections`
+  row and shows connected status. Booked meetings then auto-record.
+- **"Record a meeting now":** paste a Zoom/Teams/Meet/Webex link → POST to the
+  `bot-dispatch` Edge Function `{ meeting_url, type: 'meeting' }`. A bot joins and
+  records; the call appears in the book with `capture='bot'` and a **platform
+  badge** (Zoom/Teams/Meet/Webex).
+- Meeting calls flow through the SAME review pipeline as field calls — no separate UI.
+
+**One unified book of business (the core differentiator):** the call list shows
+field captures (mic/upload) AND meeting-bot captures **together**, newest-first,
+each with a capture/platform badge. "Every conversation — in person, phone, and
+every video platform — in one book." Lead the empty state + headline copy with this.
+
 **Data model (already created in Supabase — match these tables):**
-`contacts`, `calls`, `call_insights`, `line_items`, `sync_log`. Privacy is a
-`contacts.privacy_mode` enum: `full | line_items_only | never_sync`.
+`contacts`, `calls` (now also `capture='bot'`, `platform`, `meeting_url`,
+`calendar_event_id`), `call_insights`, `line_items`, `sync_log`,
+`calendar_connections`. Privacy is a `contacts.privacy_mode` enum:
+`full | line_items_only | never_sync`.
 
 **Review screen:** list calls newest-first with status + signal badge. Tap a call to
 open detail:
