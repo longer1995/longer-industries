@@ -54,6 +54,13 @@ open detail:
 - Let me **edit fields, redact, Approve, or Discard**. Approve sets
   `call_insights.sync_status = 'approved'`.
 - A per-contact **privacy mode** selector.
+- **Send recap** button (the headline feature): POSTs to the `recap` Edge Function
+  `{ call_id, recipient_name?, recipient_email? }` and returns a `share_url`. Show a
+  success card with **Copy link / Share** (and an Open preview that loads the hosted
+  branded recap page). The recap is a polished, customer-facing page with a clean
+  quote table — make this action feel premium; it's how the product spreads.
+- Show recap status on the call once sent (Sent / **Viewed** when `view_count > 0`),
+  so the rep sees when the customer opened it.
 
 **CRM pipeline panel:** kanban (New → Qualified → Quoting → Won) of calls/deals.
 Each card has **Push to CRM** (dropdown: HubSpot, Zoho → calls the `sync` Edge
