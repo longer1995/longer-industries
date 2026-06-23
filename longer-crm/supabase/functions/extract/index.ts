@@ -57,6 +57,48 @@ const EXTRACTION_TOOL = {
           required: ["description"],
         },
       },
+      actions: {
+        type: "array",
+        description:
+          "Concrete actions the rep could take, detected from the call. e.g. an " +
+          "invite ('happy hour July 1 7pm'), a promised follow-up, a quote to send.",
+        items: {
+          type: "object",
+          properties: {
+            kind: {
+              type: "string",
+              enum: ["calendar_event", "follow_up", "draft_email", "create_quote", "reminder", "add_contact"],
+            },
+            title: { type: "string", description: "Short label, e.g. 'Happy hour with Jason @ Soup & Sons'." },
+            body: { type: "string" },
+            due_at: {
+              type: "string",
+              description: "ISO 8601 datetime if a specific date/time was mentioned, else omit.",
+            },
+          },
+          required: ["kind", "title"],
+        },
+      },
+      memory: {
+        type: "array",
+        description:
+          "Durable facts worth remembering about the CONTACT for relationship-building: " +
+          "family/pet names, birthdays, interests, prior business, preferences. " +
+          "These default to private to the rep — capture generously.",
+        items: {
+          type: "object",
+          properties: {
+            kind: {
+              type: "string",
+              enum: ["family", "personal", "interest", "birthday", "prior_business", "preference", "deal_history", "note"],
+            },
+            key: { type: "string", description: "e.g. 'spouse', 'dog', 'birthday', 'hobby'." },
+            value: { type: "string", description: "e.g. 'Sarah', 'Rex', 'July 1', 'golf'." },
+            date_value: { type: "string", description: "ISO date (YYYY-MM-DD) if this fact is a date, else omit." },
+          },
+          required: ["kind", "value"],
+        },
+      },
     },
     required: ["signal", "intent", "summary", "confidence", "line_items"],
   },
@@ -72,7 +114,7 @@ Deno.serve(async (req) => {
 
     const db = adminClient();
     const { data: call } = await db
-      .from("calls").select("id, type, transcript").eq("id", call_id).single();
+      .from("calls").select("id, type, transcript, owner_id, contact_id").eq("id", call_id).single();
     if (!call?.transcript) return json({ error: "no transcript for call" }, 400);
 
     const resp = await fetch("https://api.anthropic.com/v1/messages", {
@@ -142,7 +184,47 @@ Deno.serve(async (req) => {
       );
     }
 
-    return json({ call_id, insights: out, auto_approved: autoEligible });
+    // Detected actions → one-tap "add to calendar?" cards (proposed until confirmed).
+    await db.from("detected_actions").delete().eq("call_id", call_id);
+    if (Array.isArray(out.actions) && out.actions.length) {
+      await db.from("detected_actions").insert(
+        out.actions.map((a: any) => ({
+          owner_id: call.owner_id,
+          call_id,
+          contact_id: call.contact_id,
+          kind: a.kind,
+          title: a.title,
+          body: a.body ?? null,
+          due_at: a.due_at ?? null,
+          state: "proposed",
+        })),
+      );
+    }
+
+    // Relationship memory → the compounding moat. Private to the rep by default.
+    if (call.contact_id && Array.isArray(out.memory) && out.memory.length) {
+      await db.from("relationship_memory").insert(
+        out.memory.map((m: any) => ({
+          owner_id: call.owner_id,
+          contact_id: call.contact_id,
+          source_call: call_id,
+          kind: m.kind,
+          key: m.key ?? null,
+          value: m.value,
+          date_value: m.date_value ?? null,
+          visibility: "private",
+          confidence: out.confidence ?? null,
+        })),
+      );
+    }
+
+    return json({
+      call_id,
+      insights: out,
+      auto_approved: autoEligible,
+      actions: out.actions?.length ?? 0,
+      memory: out.memory?.length ?? 0,
+    });
   } catch (e) {
     return json({ error: String(e) }, 500);
   }
