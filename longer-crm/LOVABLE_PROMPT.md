@@ -9,6 +9,12 @@ Build a mobile-first PWA called **Longer CRM** — a field sales call-capture to
 for an industrial / B2B sales operator. Use **React + Supabase** (Auth, Postgres,
 Storage). Clean, fast, thumb-friendly. Dark UI.
 
+**Branding:** The product is its own brand, **Longer CRM**, with a maker
+attribution to Atlas Agentics. Show a small, muted **"by Atlas Agentics"** line:
+(1) under the app name on the login/auth screen, and (2) in a quiet footer/about
+line. Keep it subtle — secondary text color, smaller than the product name. The
+PWA install name (manifest `name`) is "Longer CRM"; the short name is "Longer".
+
 **Home screen:** four large tap buttons — **Meeting · Sales Call · Order · Support**.
 Tapping one opens a recording sheet for that call type:
 - Request microphone permission and record audio (works with AirPods/Bluetooth mic).

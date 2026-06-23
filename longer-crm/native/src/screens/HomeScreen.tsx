@@ -6,6 +6,7 @@ export function HomeScreen({ onPick }: { onPick: (type: CallType, label: string)
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Longer CRM</Text>
+      <Text style={styles.maker}>by Atlas Agentics</Text>
       <Text style={styles.subtitle}>Tap to capture</Text>
       <View style={styles.grid}>
         {CALL_TYPES.map(({ type, label }) => (
@@ -21,7 +22,8 @@ export function HomeScreen({ onPick }: { onPick: (type: CallType, label: string)
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0b0b0c", paddingTop: 80, paddingHorizontal: 20 },
   title: { color: "#fff", fontSize: 32, fontWeight: "700" },
-  subtitle: { color: "#9aa0a6", fontSize: 16, marginTop: 4, marginBottom: 28 },
+  maker: { color: "#6b7075", fontSize: 13, marginTop: 2 },
+  subtitle: { color: "#9aa0a6", fontSize: 16, marginTop: 12, marginBottom: 28 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 16 },
   tile: {
     width: "47%",
