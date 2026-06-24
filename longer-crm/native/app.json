@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Longer CRM",
+    "slug": "longer-crm",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "longercrm",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.longerindustries.crm",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Longer CRM records meetings and sales calls so it can transcribe them and build your CRM notes."
+      }
+    },
+    "android": {
+      "package": "com.longerindustries.crm",
+      "permissions": ["RECORD_AUDIO"]
+    },
+    "plugins": [
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Longer CRM to record meetings and sales calls."
+        }
+      ]
+    ]
+  }
+}

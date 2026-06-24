@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink text-bone font-sans antialiased;
+    /* Subtle warm vignette so the near-black never reads as flat. */
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(194, 162, 78, 0.05), transparent 60%),
+      radial-gradient(100% 60% at 100% 100%, rgba(176, 107, 99, 0.03), transparent 55%);
+    background-attachment: fixed;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Tabular figures everywhere numbers matter. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "cv01" 1;
+  }
+
+  ::selection {
+    background: rgba(194, 162, 78, 0.25);
+    color: #f4f1ea;
+  }
+}
+
+@layer components {
+  /* Thin uppercase eyebrow used across the terminal UI. */
+  .eyebrow {
+    @apply text-2xs font-mono uppercase tracking-[0.18em] text-bone-faint;
+  }
+
+  /* Hairline-bordered surface. */
+  .surface {
+    @apply rounded-2xl border border-ink-line bg-ink-raised shadow-raise;
+  }
+
+  /* Skeleton shimmer. */
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-ink-high;
+  }
+  .skeleton::after {
+    @apply absolute inset-0;
+    content: "";
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.04),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: shimmer 1.6s infinite;
+  }
+}
+
+/* Hide scrollbars on the mobile shell while keeping scroll. */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
